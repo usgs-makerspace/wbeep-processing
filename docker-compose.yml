@@ -1,0 +1,18 @@
+version: "3.1" 
+services:
+  wbeep_processor:
+    image: wbeep_processing
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8787:8787"
+    volumes:
+      - data:/home/rstudio/wbeep-processing                                                                                              
+    environment:
+      - ROOT=TRUE
+      - PASSWORD=mypass
+
+volumes:
+  data:
+
