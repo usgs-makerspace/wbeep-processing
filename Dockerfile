@@ -5,7 +5,7 @@ RUN sudo apt-get install -y curl &&\
   curl -sL https://deb.nodesource.com/setup_12.x | bash - &&\
   sudo apt-get install -y nodejs &&\
   sudo apt-get update &&\
-  npm install -g mapshaper
+  npm install -g mapshaper topojson-client
 
 #bring in DOI root cert.  Remove this statement for non-USGS persons
 RUN /usr/bin/wget -O /usr/lib/ssl/certs/DOIRootCA.crt http://sslhelp.doi.net/docs/DOIRootCA2.cer && \

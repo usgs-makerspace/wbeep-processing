@@ -13,10 +13,6 @@ library(parallel)
 message(detectCores(), ' cores available, using all but 1')
 print(gc()) #see memory available
 
-#why isn't mapshaper found in container?
-system('npm list -g')
-system('mapshaper')
-
 cl <- makeCluster(detectCores() - 1)
 split_hru_shapes <- clusterSplit(cl, hru_reduced$Shape)
 #takes ~10 minutes on my laptop with 7 core cluster
