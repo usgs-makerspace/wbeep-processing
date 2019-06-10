@@ -1,0 +1,29 @@
+pipeline {
+  agent none 
+  stages {
+    stage('Checkout repo and pull from S3') {
+      agent any 
+      steps {
+        sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
+        git "https://github.com/wdwatkins/wbeep-processing"
+        sh 'aws s3 sync prod-owi-resources/resources/Application/wbeep/development/hru_shape/GF_nat_reg.gdb cache/GF_nat_reg.gdb --recursive'
+      }
+    }
+    stage('geodatabase simplification') {
+      agent {
+        docker {
+          image 'code.chs.usgs.gov:5001/wwatkins/water-use-15-docker/water-use-15'
+        } 
+      }
+      steps {
+        sh 'Rscript -e "source('src/process_hru_shapes.R')"'
+      }
+    }
+    stage('push to S3') {
+      agent any
+      steps { 
+        sh 'aws s3 sync topojson_valid_quant.topojson prod-owi-resources/resources/Application/wbeep/development/hru_shape/simple/topojson_valid_quant.topojson'
+      }
+    }
+  }
+}
