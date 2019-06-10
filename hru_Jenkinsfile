@@ -13,7 +13,7 @@ pipeline {
       agent {
         docker {
           image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:latest'
-          args '--pull'
+          args '--pull=always'
         } 
       }
       steps {
