@@ -2,7 +2,8 @@ library(sf)
 library(lwgeom)
 #proj_string <- '+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m'
 proj_string <- 4326
-#TODO: replace with pull from S3 once bucket is made
+
+system('topoquantize')
 gfdb <- "cache/GF_nat_reg.gdb"
 hru_reduced <- read_sf(gfdb, "nhru")  %>% 
   dplyr::select(Shape, hru_id_nat) %>% 
