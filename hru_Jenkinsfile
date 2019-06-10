@@ -12,7 +12,7 @@ pipeline {
     stage('geodatabase simplification') {
       agent {
         docker {
-          image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:wbeep-data-processing'
+          image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:latest'
         } 
       }
       steps {
