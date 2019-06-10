@@ -12,11 +12,11 @@ pipeline {
     stage('geodatabase simplification') {
       agent {
         docker {
-          image 'code.chs.usgs.gov:5001/wwatkins/water-use-15-docker/water-use-15'
+          image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:latest'
         } 
       }
       steps {
-        sh 'Rscript -e source("src/process_hru_shapes.R")'
+        sh 'Rscript -e "source(\\\'src/process_hru_shapes.R\\\')"'
       }
     }
     stage('push to S3') {
