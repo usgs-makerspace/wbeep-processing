@@ -10,6 +10,8 @@ hru_reduced <- read_sf(gfdb, "nhru")  %>%
 
 #parallelize validation
 library(parallel)
+message(detectCores(), ' cores available, using all but 1')
+gc() #see memory available 
 cl <- makeCluster(detectCores() - 1)
 split_hru_shapes <- clusterSplit(cl, hru_reduced$Shape)
 #takes ~10 minutes on my laptop with 7 core cluster
