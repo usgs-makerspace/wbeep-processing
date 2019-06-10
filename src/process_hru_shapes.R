@@ -13,6 +13,10 @@ library(parallel)
 message(detectCores(), ' cores available, using all but 1')
 print(gc()) #see memory available
 
+#why isn't mapshaper found in container?
+system('npm list -g')
+system('mapshaper')
+
 cl <- makeCluster(detectCores() - 1)
 split_hru_shapes <- clusterSplit(cl, hru_reduced$Shape)
 #takes ~10 minutes on my laptop with 7 core cluster
@@ -23,8 +27,7 @@ stopCluster(cl)
 #NOTE: assuming orders haven't been shuffled here
 hru_reduced$Shape <- hru_valid_shapes
 write_sf(hru_reduced, 'cache/hru_reduced_valid.shp')
-#why isn't mapshaper found in container?
-system('npm list -g')
+
 system('mapshaper cache/hru_reduced_valid.shp -simplify 1% -o simp_10.topojson')
 list.files()
 #now revalidate
