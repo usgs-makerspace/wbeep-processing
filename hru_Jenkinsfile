@@ -16,7 +16,7 @@ pipeline {
         } 
       }
       steps {
-        r "source('src/process_hru_shapes.R')"
+        sh 'Rscript -e "source(\'src/process_hru_shapes.R\')"'
       }
     }
     stage('push to S3') {
