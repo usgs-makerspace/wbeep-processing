@@ -1,5 +1,12 @@
 FROM rocker/geospatial:3.6.0 
 
+ARG BUILD_DATE
+
+LABEL maintainer="wwatkins@usgs.gov"
+LABEL version=0.1.0
+LABEL org.label-schema.build-date=$BUILD_DATE
+
+
 RUN sudo apt-get install -y curl &&\
   sudo apt-get install -y gnupg &&\
   curl -sL https://deb.nodesource.com/setup_12.x | bash - &&\
