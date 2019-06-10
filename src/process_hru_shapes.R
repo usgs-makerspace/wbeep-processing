@@ -23,7 +23,9 @@ stopCluster(cl)
 #NOTE: assuming orders haven't been shuffled here
 hru_reduced$Shape <- hru_valid_shapes
 write_sf(hru_reduced, 'cache/hru_reduced_valid.shp')
-system('/usr/bin/mapshaper cache/hru_reduced_valid.shp -simplify 1% -o simp_10.topojson')
+#why isn't mapshaper found in container?
+system('npm list -g')
+system('mapshaper cache/hru_reduced_valid.shp -simplify 1% -o simp_10.topojson')
 list.files()
 #now revalidate
 library(geojsonio)
