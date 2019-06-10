@@ -16,6 +16,7 @@ pipeline {
         } 
       }
       steps {
+        sh 'du -h' 
         sh 'Rscript -e "source(\'src/process_hru_shapes.R\')"'
       }
     }

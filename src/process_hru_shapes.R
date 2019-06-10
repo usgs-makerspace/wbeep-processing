@@ -11,7 +11,8 @@ hru_reduced <- read_sf(gfdb, "nhru")  %>%
 #parallelize validation
 library(parallel)
 message(detectCores(), ' cores available, using all but 1')
-gc() #see memory available 
+print(gc()) #see memory available
+
 cl <- makeCluster(detectCores() - 1)
 split_hru_shapes <- clusterSplit(cl, hru_reduced$Shape)
 #takes ~10 minutes on my laptop with 7 core cluster
@@ -23,7 +24,7 @@ stopCluster(cl)
 hru_reduced$Shape <- hru_valid_shapes
 write_sf(hru_reduced, 'cache/hru_reduced_valid.shp')
 system('mapshaper cache/hru_reduced_valid.shp -simplify 1% -o simp_10.topojson')
-
+list.files()
 #now revalidate
 library(geojsonio)
 geojson_hru <- topojson_read('simp_10.topojson', check_ring_dir = TRUE)
