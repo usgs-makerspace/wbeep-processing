@@ -7,8 +7,7 @@ LABEL version=0.2.0
 LABEL org.label-schema.build-date=$BUILD_DATE
 
 
-RUN sudo apt-get install -y curl &&\
-  sudo apt-get install -y gnupg 
+RUN sudo apt-get install -y curl gnupg gdal-bin
 
 #bring in DOI root cert.  Remove this statement for non-USGS persons
 RUN /usr/bin/wget -O /usr/lib/ssl/certs/DOIRootCA.crt http://sslhelp.doi.net/docs/DOIRootCA2.cer && \
