@@ -3,16 +3,12 @@ FROM rocker/geospatial:3.6.0
 ARG BUILD_DATE
 
 LABEL maintainer="wwatkins@usgs.gov"
-LABEL version=0.1.0
+LABEL version=0.2.0
 LABEL org.label-schema.build-date=$BUILD_DATE
 
 
 RUN sudo apt-get install -y curl &&\
-  sudo apt-get install -y gnupg &&\
-  curl -sL https://deb.nodesource.com/setup_12.x | bash - &&\
-  sudo apt-get install -y nodejs &&\
-  sudo apt-get update &&\
-  npm install -g mapshaper topojson-client
+  sudo apt-get install -y gnupg 
 
 #bring in DOI root cert.  Remove this statement for non-USGS persons
 RUN /usr/bin/wget -O /usr/lib/ssl/certs/DOIRootCA.crt http://sslhelp.doi.net/docs/DOIRootCA2.cer && \

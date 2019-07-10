@@ -4,3 +4,6 @@
 .Ruserdata
 *json
 cache/*
+tile*
+*.png
+*.gz

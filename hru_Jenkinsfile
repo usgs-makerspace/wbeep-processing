@@ -17,14 +17,13 @@ pipeline {
         } 
       }
       steps {
-        sh 'df -h' 
         sh 'Rscript -e "source(\'src/process_hru_shapes.R\')"'
       }
     }
     stage('push to S3') {
       agent any
       steps { 
-        sh 'aws s3 cp topojson_valid_quant.topojson s3://prod-owi-resources/resources/Application/wbeep/development/hru_shape/simple/topojson_valid_quant.topojson'
+        sh 'aws s3 cp hrus.geojson s3://prod-owi-resources/resources/Application/wbeep/development/hru_shape/hrus.geojson'
       }
     }
   }
