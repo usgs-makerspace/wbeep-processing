@@ -1,0 +1,13 @@
+version: "3.1" 
+services:
+  wbeep_processor_tippecanoe:
+    image: code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - data:/home/wbeep-processing    
+      
+volumes:
+  data:
+
