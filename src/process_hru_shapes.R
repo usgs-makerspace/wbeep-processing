@@ -22,9 +22,12 @@ stopCluster(cl)
 
 #NOTE: assuming orders haven't been shuffled here
 hru_reduced$Shape <- hru_valid_shapes
+
+######TODO: just write out geojson here - 5 dec precision, then tippecanoe
+
 write_sf(hru_reduced, 'cache/hru_reduced_valid.shp')
 
-system('mapshaper cache/hru_reduced_valid.shp -simplify 1% -o simp_10.topojson')
+system('node  --max-old-space-size=8192 `which mapshaper` cache/hru_reduced_valid.shp -simplify percentage=10% keep-shapes stats -o simp_10.topojson')
 list.files()
 #now revalidate
 library(geojsonio)
