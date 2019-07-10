@@ -1,6 +1,5 @@
 library(sf)
 library(lwgeom)
-library(geojsonio)
 #proj_string <- '+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m'
 proj_string <- 4326
 
@@ -23,6 +22,7 @@ stopCluster(cl)
 
 #NOTE: assuming orders haven't been shuffled here
 hru_reduced$Shape <- hru_valid_shapes
+#Too big an object to write to geojson directly, since 
+#R tries to serialize it all in memory — have to use ogr2ogr
+write_sf(hru_reduced, 'hru_reduced_valid.shp')
 
-geojson_write(hru_reduced, geometry = "polygon", precision = 5,
-              file = "hrus.geojson", convert_wgs84 = TRUE)
