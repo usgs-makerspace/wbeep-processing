@@ -6,8 +6,7 @@ pipeline {
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
         git "https://github.com/usgs-makerspace/wbeep-processing"
-        sh 'rm -rf hrus.geojson'
-        sh 'aws s3 cp s3://prod-owi-resources/resources/Application/wbeep/development/hru_shape/hrus.geojson .'
+        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/development/hru_shape . --exclude "*" --include "hrus.geojson"'
       }
     }
     stage('create tileset') {
@@ -24,7 +23,7 @@ pipeline {
     stage('push to S3') {
       agent any
       steps { 
-        sh 'aws s3 sync tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/development/hru_shape/tile_dir_simple5 --recursive'
+        sh 'aws s3 sync tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/development/hru_shape/tile_dir_simple5'
       }
     }
   }
