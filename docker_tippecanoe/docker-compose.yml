@@ -5,9 +5,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - "8787:8787"
     volumes:
       - data:/home/wbeep-processing    
-      
+    environment:
+      - ROOT=TRUE   
+    tty: TRUE  
+    stdin_open: TRUE
+ 
 volumes:
   data:
 
