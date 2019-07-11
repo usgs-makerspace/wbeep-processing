@@ -25,7 +25,7 @@ RUN mkdir -p /tmp/tippecanoe-src
 WORKDIR /tmp/tippecanoe-src
 
 # Build tippecanoe
-RUN git clone https://github.com/mapbox/tippecanoe.git 
+RUN git clone https://github.com/mapbox/tippecanoe.git /tmp/tippecanoe-src
 
 RUN make && make install \
   && rm -rf /tmp/tippecanoe-src \
