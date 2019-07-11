@@ -11,7 +11,9 @@ LABEL org.label-schema.build-date=$BUILD_DATE
 # Update repos and install dependencies
 RUN apt-get update \
   && apt-get -y upgrade \
-  && apt-get -y install git build-essential libsqlite3-dev zlib1g-dev wget
+  && apt-get -y install git build-essential libsqlite3-dev zlib1g-dev wget \
+  && apt-get -y remove --purge build-essential \
+  && apt-get -y autoremove
 
 #bring in DOI root cert.  Remove this statement for non-USGS persons
 RUN /usr/bin/wget -O /usr/lib/ssl/certs/DOIRootCA.crt http://sslhelp.doi.net/docs/DOIRootCA2.cer && \
@@ -20,14 +22,12 @@ RUN /usr/bin/wget -O /usr/lib/ssl/certs/DOIRootCA.crt http://sslhelp.doi.net/doc
 
 # Create a directory and copy in all files
 RUN mkdir -p /tmp/tippecanoe-src
-RUN git clone https://github.com/mapbox/tippecanoe.git /tmp/tippecanoe-src
+
 WORKDIR /tmp/tippecanoe-src
 
 # Build tippecanoe
-RUN make \
-  && make install
+RUN git clone https://github.com/mapbox/tippecanoe.git /tmp/tippecanoe-src && \
+  make && make install && \
+  rm -rf /tmp/tippecanoe-src 
 
-# Remove the temp directory and unneeded packages
 WORKDIR /home/wbeep-processing
-RUN rm -rf /tmp/tippecanoe-src \
-  && apt-get -y remove --purge build-essential && apt-get -y autoremove

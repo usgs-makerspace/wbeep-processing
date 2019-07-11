@@ -1,5 +1,9 @@
 pipeline {
-  agent none 
+  agent {
+        node {
+            label 'node:slave'
+        }
+    }
   stages {
     stage('Checkout repo and pull from S3') {
       agent any 
