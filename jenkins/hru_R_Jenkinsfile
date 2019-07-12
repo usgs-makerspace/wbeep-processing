@@ -28,7 +28,7 @@ pipeline {
     stage('push to S3') {
       agent any
       steps { 
-        sh 'aws s3 cp hrus.geojson s3://prod-owi-resources/resources/Application/wbeep/development/hru_shape/hrus.geojson --content-type "application/json"'
+        sh 'aws s3 cp hrus.geojson s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/hrus.geojson --content-type "application/json"'
       }
     }
   }
