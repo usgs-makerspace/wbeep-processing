@@ -1,10 +1,9 @@
 version: "3.1" 
 services:
   wbeep_processor:
-    image: wbeep_processing
+    image: code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:R-latest
     build:
       context: .
-      dockerfile: Dockerfile
     ports:
       - "8787:8787"
     volumes:

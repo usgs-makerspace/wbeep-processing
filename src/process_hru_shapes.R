@@ -22,20 +22,7 @@ stopCluster(cl)
 
 #NOTE: assuming orders haven't been shuffled here
 hru_reduced$Shape <- hru_valid_shapes
-write_sf(hru_reduced, 'cache/hru_reduced_valid.shp')
+#Too big an object to write to geojson directly, since 
+#R tries to serialize it all in memory — have to use ogr2ogr
+write_sf(hru_reduced, 'hru_reduced_valid.shp')
 
-system('mapshaper cache/hru_reduced_valid.shp -simplify 1% -o simp_10.topojson')
-list.files()
-#now revalidate
-library(geojsonio)
-geojson_hru <- topojson_read('simp_10.topojson', check_ring_dir = TRUE)
-geojson_hru$geometry <- st_make_valid(geojson_hru$geometry)
-#st_dimension to check for null geoms
-dim_check <- st_dimension(geojson_hru$geometry)
-null_geoms <- which(is.na(dim_check))
-geojson_hru_drop_nulls <- dplyr::slice(geojson_hru, -null_geoms)
-st_crs(geojson_hru_drop_nulls) <- proj_string
-topojson_write(geojson_hru_drop_nulls, geometry = "polygon",
-              file = "topojson_valid.topojson",
-              convert_wgs84 = TRUE)
-system('topoquantize 1e6 topojson_valid.topojson -o topojson_valid_quant.topojson')
