@@ -22,7 +22,7 @@ pipeline {
       }
       steps {
         sh 'Rscript -e "source(\'src/process_hru_shapes.R\')"'
-        sh 'ogr2ogr -f GeoJSON hrus.geojson -lco COORDINATE_PRECISION=5 hru_reduced_valid.shp'
+        sh 'ogr2ogr -f GeoJSON hrus.geojson -lco COORDINATE_PRECISION=5 -lco ID_FIELD=hru_id_nat hru_reduced_valid.shp'
       }
     }
     stage('push to S3') {
