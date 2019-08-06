@@ -13,7 +13,7 @@ pipeline {
         sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/development/hru_shape/GF_nat_reg.gdb cache/GF_nat_reg.gdb'
       }
     }
-    stage('geodatabase simplification') {
+    stage('convert shapefile to geojson') {
       agent {
         docker {
           image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:R-latest'
