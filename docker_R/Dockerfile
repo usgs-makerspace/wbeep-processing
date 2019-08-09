@@ -18,6 +18,16 @@ RUN /usr/bin/wget -O /usr/lib/ssl/certs/DOIRootCA.crt http://sslhelp.doi.net/doc
 
 WORKDIR /home/rstudio/
 
+#default GDAL is kinda old, we need >= 2.3 for ID field in geojson
+#uninstall the included GDAL first
+RUN sudo apt-get remove libgdal-dev \
+  && wget http://download.osgeo.org/gdal/2.4.2/gdal-2.4.2.tar.gz \
+  && tar -xzvf gdal-2.4.2.tar.gz \
+  && cd gdal-2.4.2 \
+  && ./configure --prefix=/usr \
+  && make && make install \
+  && rm gdal-2.4.2.tar.gz && rm -rf gdal-2.4.2
+
 RUN install2.r --error \
 	lwgeom \	
  	geojsonio
