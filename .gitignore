@@ -7,3 +7,8 @@ cache/*
 tile*
 *.png
 *.gz
+*.dbf
+*.prj
+*.shp
+*.shx
+*.zip
