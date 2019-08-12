@@ -11,7 +11,7 @@ pipeline {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
         git "https://github.com/usgs-makerspace/wbeep-processing"
         sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape . --exclude "*" --include "hrus.geojson"'
-		sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_data . --exclude "*" --include "hru_data.csv"'
+        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_data . --exclude "*" --include "hru_data.csv"'
       }
     }
     stage('create tileset') {
@@ -23,7 +23,7 @@ pipeline {
       }
       steps {
         sh 'tippecanoe -Z4 -z8 --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory tile_dir_simple5 hrus.geojson'
-		sh 'tile-join --output-to-directory tile_dir_simple5_data -c hru_data.csv tile_dir_simple5' 
+        sh 'tile-join --output-to-directory tile_dir_simple5_data -c hru_data.csv tile_dir_simple5' 
       }
     }
     stage('push to S3') {
