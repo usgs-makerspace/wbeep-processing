@@ -37,5 +37,9 @@ pipeline {
       }
     }
   }
+  node {
+    TIER_VAL: ${TIER}
+    build job: 'tippecanoe_tile_join', parameters: [[$class: 'StringParameterValue', name: 'TIER', value: TIER_VAL]]
+}
 }
 
