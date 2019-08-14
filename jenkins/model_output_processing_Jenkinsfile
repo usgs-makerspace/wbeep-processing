@@ -33,7 +33,7 @@ pipeline {
     stage('push to S3') {
       agent any
       steps { 
-        sh 'aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv"'
+        sh 'aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv'
       }
     }
   }
