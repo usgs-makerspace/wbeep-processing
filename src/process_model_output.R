@@ -3,7 +3,6 @@ args <- commandArgs(trailingOnly=TRUE)
 today <- args[1]
 nc <- nc_open(paste0('climate_', today, ".nc"))
 hru_ids <- ncvar_get(nc, varid = "hruid")
-prcp <- ncvar_get(nc, varid = "prcp")[,2] #yesterday's data
 #could verify time axis matches expected date
 #generate random labels for now
 #actual metric computation happens here eventually
