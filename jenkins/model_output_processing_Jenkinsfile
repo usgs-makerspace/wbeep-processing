@@ -4,9 +4,6 @@ pipeline {
             label 'node:slave'
         }
     }
-  parameters {
-    string(name: 'DATE', defaultValue: '')
-  }
   stages {
     stage('Checkout repo and pull model output from S3') {
       agent any 
