@@ -12,7 +12,7 @@ pipeline {
       agent any 
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
-        git 'https://github.com/wdwatkins/wbeep-processing'
+        git 'https://github.com/usgs-makerspace/wbeep-processing'
         // This will fail if the new file isn't there
         // Note that the Jenkins is on UTC!
         // May need to actually use yesterday's date depending on what time of day this runs
