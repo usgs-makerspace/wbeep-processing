@@ -8,7 +8,6 @@ pipeline {
     string(name: 'DATE', defaultValue: '')
   }
   stages {
-    def DATE
     stage('Checkout repo and pull model output from S3') {
       agent any 
       steps {
