@@ -1,0 +1,41 @@
+pipeline {
+  agent {
+        node {
+            label 'node:slave'
+        }
+    }
+  parameters {
+    string(name: 'DATE', defaultValue: '')
+  }
+  stages {
+    stage('Checkout repo and pull model output from S3') {
+      agent any 
+      steps {
+        sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
+        git 'https://github.com/usgs-makerspace/wbeep-processing'
+        // This will fail if the new file isn't there
+        // Note that the Jenkins is on UTC!
+        // May need to actually use yesterday's date depending on what time of day this runs
+        sh 'env.DATE=$(date +"%Y_%m_%d"); wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${env.DATE}.nc'
+      }
+    }
+    stage('convert model output to csv for tile-join') {
+      agent {
+        docker {
+          image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:R-latest'
+          alwaysPull true
+        } 
+      }
+      steps {
+        sh 'Rscript src/process_model_output.R ${env.DATE}'
+      }
+    }
+    stage('push to S3') {
+      agent any
+      steps { 
+        sh 'aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv"'
+      }
+    }
+  }
+}
+
