@@ -4,12 +4,13 @@ pipeline {
             label 'node:slave'
         }
     }
-  parameters {
+/*  parameters {
     string(name: DATE, defaultValue: $(date -d "yesterday 13:00" '+%Y-%m-%d') )
-  }
+  } */
   stages {
     stage('Checkout repo and pull model output from S3') {
       agent any 
+      def DATE
       DATE = sh(script: date +"%Y_%m_%d",
                   returnStdOut: True)
       steps {
