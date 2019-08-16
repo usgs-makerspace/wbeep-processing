@@ -21,7 +21,7 @@ pipeline {
         } 
       }
       steps {
-        sh 'tippecanoe -Z4 -z8 --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory tile_dir_simple5 hrus.geojson'
+        sh 'tippecanoe -Z3 -z9 --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory tile_dir_simple5 hrus.geojson'
       }
     }
     stage('push to S3') {
