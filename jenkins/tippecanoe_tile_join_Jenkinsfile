@@ -10,7 +10,7 @@ pipeline {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
         git "https://github.com/usgs-makerspace/wbeep-processing"
         sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/ . --exclude "*" --include "model_output_categorized.csv"'
-        sh 'aws s3 sync tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5'
+        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5 /tile_dir_simple5'
       }
     }
     stage('create tileset') {
