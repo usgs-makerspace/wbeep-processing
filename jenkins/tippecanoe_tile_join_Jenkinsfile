@@ -5,7 +5,7 @@ pipeline {
         }
     }
   environment {
-    PATH = "/usr/local/bin:$PATH"
+    PATH = "/usr/local/bin:${env.PATH}"
   }
   stages {
     stage('Checkout repo and pull from S3') {
