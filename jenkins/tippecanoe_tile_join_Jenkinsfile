@@ -16,8 +16,8 @@ pipeline {
         git "https://github.com/usgs-makerspace/wbeep-processing"
         sh "mkdir ${WORKSPACE}/tile_dir_simple5"
         sh "mkdir ${WORKSPACE}/tiles"
-        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/ . --exclude "*" --include "model_output_categorized.csv"'
-        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5 ${WORKSPACE}/tile_dir_simple5'
+        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/development/ . --exclude "*" --include "model_output_categorized.csv"'
+        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/development/hru_shape/tile_dir_simple5 ${WORKSPACE}/tile_dir_simple5'
       }
     }
     stage('create tileset') {
@@ -34,7 +34,7 @@ pipeline {
     }
     stage('push to S3') {
       steps { 
-        sh 'aws s3 sync tiles s3://wbeep-${TIER}-website/tiles --content-encoding "gzip" --content-type application/gzip'
+        sh 'aws s3 sync tiles s3://wbeep-test-website/tiles --content-encoding "gzip" --content-type application/gzip'
       }
     }
   }
