@@ -1,5 +1,7 @@
 pipeline {
-  agent any
+  agent {
+    label: slave
+  }
   stages {
     stage('Checkout repo and pull from S3') {
       steps {
@@ -16,6 +18,7 @@ pipeline {
         docker {
           image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest'
           alwaysPull true
+		  reuseNode true
         } 
       }
       steps {
