@@ -35,7 +35,6 @@ pipeline {
     stage('push to S3') {
       steps { 
         sh 'aws s3 sync tiles s3://wbeep-test-website/tiles --content-encoding "gzip" --content-type application/gzip'
-		sh 'aws s3 sync tiles/metadata.json s3://wbeep-test-website/tiles --content-type application/json'
       }
     }
   }
