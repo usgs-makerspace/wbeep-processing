@@ -9,7 +9,6 @@ pipeline {
   } */
   stages {
     stage('Checkout repo and pull model output from S3') {
-      agent any 
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
         git 'https://github.com/usgs-makerspace/wbeep-processing'
@@ -24,6 +23,7 @@ pipeline {
         docker {
           image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:R-latest'
           alwaysPull true
+          reuseNode true
         } 
       }
       steps {
@@ -31,15 +31,14 @@ pipeline {
       }
     }
     stage('push to S3') {
-      agent any
       steps { 
         sh 'aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv'
       }
     }
+    stage('build downstream job') {
+      steps { 
+        build job: 'tippecanoe_tile_join', parameters: [[$class: 'StringParameterValue', name: 'TIER', value: TIER]]
+      }
+    }
   }
-  node {
-    TIER_VAL: ${TIER}
-    build job: 'tippecanoe_tile_join', parameters: [[$class: 'StringParameterValue', name: 'TIER', value: TIER_VAL]]
 }
-}
-
