@@ -27,12 +27,12 @@ pipeline {
         } 
       }
       steps {
-        sh 'DATE=$(date -d "yesterday 13:00" "+%Y_%m_%d"); Rscript src/process_model_output.R ${DATE}'
+        sh "DATE=$(date -d 'yesterday 13:00' '+%Y_%m_%d'); Rscript src/process_model_output.R ${DATE}"
       }
     }
     stage('push to S3') {
       steps { 
-        sh 'aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv'
+        sh "aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv"
       }
     }
     stage('build downstream job') {
