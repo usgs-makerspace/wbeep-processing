@@ -27,7 +27,7 @@ pipeline {
         } 
       }
       steps {
-        sh "DATE=\$(date -d 'yesterday 13:00' '+%Y_%m_%d'); Rscript src/process_model_output.R ${DATE}"
+        sh 'DATE=\$(date -d "yesterday 13:00" "+%Y_%m_%d"); Rscript src/process_model_output.R ${DATE}'
       }
     }
     stage('push to S3') {
