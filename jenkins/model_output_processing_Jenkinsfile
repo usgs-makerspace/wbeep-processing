@@ -8,7 +8,7 @@ pipeline {
         gitParameter name: 'BRANCH_TAG',
                      type: 'PT_BRANCH_TAG',
                      defaultValue: 'master'
-        choice(choices: ['test', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+        choice(choices: ['test', 'qa', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
   }
   stages {
     stage('Checkout repo and pull model output from S3') {
