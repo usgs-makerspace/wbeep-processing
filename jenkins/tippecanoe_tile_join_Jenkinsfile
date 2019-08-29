@@ -19,6 +19,7 @@ pipeline {
     stage('Checkout repo and pull from S3') {
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
+        sh 'printf ${params.BRANCH_TAG}\n; print ${params.TIER}\n'
         checkout([$class: 'GitSCM',
                           branches: [[name: "${params.BRANCH_TAG}"]],
                           doGenerateSubmoduleConfigurations: false,
@@ -47,6 +48,7 @@ pipeline {
     }
     stage('push to S3') {
       steps { 
+         #TODO: match URL with TIER variable
         sh 'aws s3 sync tiles s3://wbeep-test-website/tiles --content-encoding "gzip" --content-type application/x-protobuf'
       }
     }
