@@ -14,7 +14,7 @@ pipeline {
     stage('Checkout repo and pull model output from S3') {
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
-        git_vars = checkout([$class: 'GitSCM',
+        final git_vars = checkout([$class: 'GitSCM',
                           branches: [[name: "${params.BRANCH_TAG}"]],
                           doGenerateSubmoduleConfigurations: false,
                           extensions: [],
