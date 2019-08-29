@@ -50,8 +50,8 @@ pipeline {
     stage('build downstream job') {
       steps { 
         build job: 'tippecanoe_tile_join', 
-              parameters: [[$class: 'StringParameterValue', name: 'TIER', value: String.valueOf(TIER),
-              $class: 'GitParameterValue', name: BRANCH_TAG, value: String.valueOf(BRANCH_TAG)]]
+              parameters: [string(name: 'TIER', value: '${params.TIER}'),
+              string(name: BRANCH_TAG, value: '{params.BRANCH_TAG})]
       }
     }
   }
