@@ -14,7 +14,7 @@ pipeline {
     stage('Checkout repo and pull model output from S3') {
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
-         checkout([$class: 'GitSCM',
+        git_vars = checkout([$class: 'GitSCM',
                           branches: [[name: "${params.BRANCH_TAG}"]],
                           doGenerateSubmoduleConfigurations: false,
                           extensions: [],
@@ -49,9 +49,10 @@ pipeline {
     }
     stage('build downstream job') {
       steps { 
+        sh 'print git_vars' 
         build job: 'tippecanoe_tile_join', 
               parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
-              string(name: 'BRANCH_TAG', value: gitParameter.valueOf(BRANCH_TAG))]
+              string(name: 'BRANCH_TAG', value: '${git_vars.branches}')]
       }
     }
   }
