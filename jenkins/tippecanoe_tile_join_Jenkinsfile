@@ -48,7 +48,7 @@ pipeline {
     }
     stage('push to S3') {
       steps { 
-         /TODO: match URL with TIER variable
+         //TODO: match URL with TIER variable
         sh 'aws s3 sync tiles s3://wbeep-test-website/tiles --content-encoding "gzip" --content-type application/x-protobuf'
       }
     }
