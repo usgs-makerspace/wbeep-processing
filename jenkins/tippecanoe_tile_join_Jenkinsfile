@@ -50,10 +50,11 @@ pipeline {
       steps { 
          //TODO: match URL with TIER variable
           script {
-                    if ("${params.TIER}" == "prod") {
+                    echo "${TIER}"
+                    if ("${TIER}" == "prod") {
                         targetDomain = "s3://wbeep-prod-website"
                     }   
-                    else if ("${params.TIER}" == "qa") {
+                    else if ("${TIER}" == "qa") {
                         //only here for testing propagating variable
                         // we aren't using tiles hosted here
                         targetDomain = "s3://wbeep-qa-website"
@@ -62,7 +63,7 @@ pipeline {
                         targetDomain = "s3://wbeep-test-website"
                     }   
             }
-        sh 'echo ${targetDomain}'
+        sh "echo ${targetDomain}""
         sh 'aws s3 sync tiles ${targetDomain}/tiles --content-encoding "gzip" --content-type application/x-protobuf'
       }
     }
