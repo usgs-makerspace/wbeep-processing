@@ -20,7 +20,7 @@ pipeline {
                           extensions: [],
                           gitTool: 'Default',
                           submoduleCfg: [],
-                          userRemoteConfigs: [[url: 'https://github.com/wdwatkins/wbeep-processing']]
+                          userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
                         ])
         //git 'https://github.com/usgs-makerspace/wbeep-processing'
         // This will fail if the new file isn't there
