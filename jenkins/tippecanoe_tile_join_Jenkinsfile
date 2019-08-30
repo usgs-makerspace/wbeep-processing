@@ -63,7 +63,7 @@ pipeline {
                     }   
             }
         sh "echo ${targetDomain}; echo ${TIER}"
-        sh 'aws s3 sync tiles ${targetDomain}/tiles --content-encoding "gzip" --content-type application/x-protobuf'
+        sh "aws s3 sync tiles ${targetDomain}/tiles --content-encoding gzip --content-type application/x-protobuf"
       }
     }
   }
