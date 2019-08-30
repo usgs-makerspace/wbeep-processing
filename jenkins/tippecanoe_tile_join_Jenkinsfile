@@ -48,7 +48,6 @@ pipeline {
     }
     stage('push to S3') {
       steps { 
-         //TODO: match URL with TIER variable
           script {
                     if ("${TIER}" == "prod") {
                         targetDomain = "s3://wbeep-prod-website"
@@ -62,7 +61,6 @@ pipeline {
                         targetDomain = "s3://wbeep-test-website"
                     }   
             }
-        sh "echo ${targetDomain}; echo ${TIER}"
         sh "aws s3 sync tiles ${targetDomain}/tiles --content-encoding gzip --content-type application/x-protobuf"
       }
     }
