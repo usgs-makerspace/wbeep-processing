@@ -4,18 +4,30 @@ pipeline {
             label 'node:slave'
         }
     }
-/*  parameters {
-    string(name: DATE, defaultValue: $(date -d "yesterday 13:00" '+%Y-%m-%d') )
-  } */
+  parameters {
+        gitParameter name: 'BRANCH_TAG',
+                     type: 'PT_BRANCH_TAG',
+                     defaultValue: 'master'
+        choice(choices: ['test', 'qa', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+  }
   stages {
     stage('Checkout repo and pull model output from S3') {
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
-        git 'https://github.com/usgs-makerspace/wbeep-processing'
+        checkout([$class: 'GitSCM',
+                          branches: [[name: "${params.BRANCH_TAG}"]],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [],
+                          gitTool: 'Default',
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
+                        ])
+        //git 'https://github.com/usgs-makerspace/wbeep-processing'
         // This will fail if the new file isn't there
         // Note that the Jenkins is on UTC!
         // May need to actually use yesterday's date depending on what time of day this runs
-        sh 'DATE=$(date -d "yesterday 13:00" "+%Y_%m_%d"); wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${DATE}.nc'
+        //sh 'DATE=$(date -d "yesterday 13:00" "+%Y_%m_%d"); wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${DATE}.nc'
+        sh 'DATE=2019_08_22; wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${DATE}.nc'
       }
     }
     stage('convert model output to csv for tile-join') {
@@ -27,7 +39,7 @@ pipeline {
         } 
       }
       steps {
-        sh 'DATE=\$(date -d "yesterday 13:00" "+%Y_%m_%d"); Rscript src/process_model_output.R ${DATE}'
+        sh 'DATE=2019_08_22; Rscript src/process_model_output.R ${DATE}'
       }
     }
     stage('push to S3') {
@@ -37,7 +49,10 @@ pipeline {
     }
     stage('build downstream job') {
       steps { 
-        build job: 'tippecanoe_tile_join', parameters: [[$class: 'StringParameterValue', name: 'TIER', value: TIER]]
+        sh "echo ${params.BRANCH_TAG}"
+        build job: 'tippecanoe_tile_join', 
+              parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
+              string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
       }
     }
   }

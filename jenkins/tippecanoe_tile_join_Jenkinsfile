@@ -4,6 +4,12 @@ pipeline {
             label 'node:slave'
         }
     }
+  parameters {
+        gitParameter name: 'BRANCH_TAG',
+                     type: 'PT_BRANCH_TAG',
+                     defaultValue: 'master'
+        choice(choices: ['test', 'qa', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+  }
   stages {
 	stage('Clean Workspace') {
 	  steps{
@@ -12,8 +18,16 @@ pipeline {
 	}
     stage('Checkout repo and pull from S3') {
       steps {
+        sh 'env'
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
-        git "https://github.com/usgs-makerspace/wbeep-processing"
+        checkout([$class: 'GitSCM',
+                          branches: [[name: "${params.BRANCH_TAG}"]],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [],
+                          gitTool: 'Default',
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
+                        ])
         sh "mkdir ${WORKSPACE}/tile_dir_simple5"
         sh "mkdir ${WORKSPACE}/tiles"
         sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/ . --exclude "*" --include "model_output_categorized.csv"'
@@ -34,7 +48,20 @@ pipeline {
     }
     stage('push to S3') {
       steps { 
-        sh 'aws s3 sync tiles s3://wbeep-test-website/tiles --content-encoding "gzip" --content-type application/x-protobuf'
+          script {
+                    if ("${TIER}" == "prod") {
+                        targetDomain = "s3://wbeep-prod-website"
+                    }   
+                    else if ("${TIER}" == "qa") {
+                        //only here for testing propagating variable
+                        // we aren't using tiles hosted here
+                        targetDomain = "s3://wbeep-qa-website"
+                    } 
+                    else {
+                        targetDomain = "s3://wbeep-test-website"
+                    }   
+            }
+        sh "aws s3 sync tiles ${targetDomain}/tiles --content-encoding gzip --content-type application/x-protobuf"
       }
     }
   }
