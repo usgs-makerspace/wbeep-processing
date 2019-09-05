@@ -6,7 +6,7 @@ hru_ids <- ncvar_get(nc, varid = "hruid")
 #could verify time axis matches expected date
 #generate random labels for now
 #actual metric computation happens here eventually
-vals <- ncvar_get(nc, varid = "prcp")[,1]
+vals <- ncvar_get(nc, varid = "prcp")
 vals_without_zeros <- vals[vals != 0]
 percentiles <- quantile(vals_without_zeros, probs = c(0.10, 0.30, 0.70, 0.90, 1))
 percentiles <- c(0, percentiles)
