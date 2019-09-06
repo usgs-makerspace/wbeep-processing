@@ -29,6 +29,10 @@ file_location <- "" # needs to include ending `/`
 #   2) for each HRU, calc quantiles (parallel)
 #################################################################
 
+## It is possible to pull out specific columns so we could smush all of
+## this reading/combining/parsing into each individual task
+# data <- fread("nhru_dprst_stor_hru.csv", header=TRUE, select = c(1, 3))
+## However, this assumes that columns are in the same order for each variable csv
 
 ##### Functions to do the work
 
