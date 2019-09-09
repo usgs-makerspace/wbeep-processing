@@ -21,7 +21,7 @@ pipeline {
                           extensions: [],
                           gitTool: 'Default',
                           submoduleCfg: [],
-                          userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
+                          userRemoteConfigs: [[url: 'https://github.com/wdwatkins/wbeep-processing']]
                         ])
         sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/GF_nat_reg.gdb cache/GF_nat_reg.gdb'
       }
@@ -35,7 +35,7 @@ pipeline {
       }
       steps {
         sh 'Rscript -e "source(\'src/process_hru_shapes.R\')"'
-        sh 'ogr2ogr -f GeoJSON hrus.geojson -lco COORDINATE_PRECISION=5 -lco ID_FIELD=hru_id_2 hru_reduced_valid.shp'
+        sh 'ogr2ogr -f GeoJSON hrus.geojson -lco ID_FIELD=hru_id_2 hru_reduced_valid.shp'
       }
     }
     stage('push to S3') {
