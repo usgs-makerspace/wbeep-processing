@@ -22,7 +22,7 @@ pipeline {
                           submoduleCfg: [],
                           userRemoteConfigs: [[url: 'https://github.com/wdwatkins/wbeep-processing']]
                         ])
-        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape . --exclude "*" --include "hrus.geojson"'
+        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape ${WORKSPACE} --exclude "*" --include "hrus.geojson"'
       }
     }
     stage('create tileset') {
@@ -30,7 +30,6 @@ pipeline {
         docker {
           image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest'
           alwaysPull true
-          reuseNode true
         } 
       }
       steps {
@@ -39,7 +38,7 @@ pipeline {
     }
     stage('push to S3') {
       steps { 
-        sh 'aws s3 sync tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5'
+        sh 'pwd; ls; aws s3 sync tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5'
       }
     }
     stage('build downstream job') {
