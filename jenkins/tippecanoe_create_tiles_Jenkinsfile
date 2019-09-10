@@ -46,7 +46,7 @@ pipeline {
     }
     stage('push to S3') {
       steps { 
-        sh 'pwd; ls; aws s3 sync ${DOCKER_WORKSPACE}/tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5'
+        sh 'pwd; ls; aws s3 sync /var/jenkins/workspace/MakerSpace/tippecanoe_build_tileset/tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5'
       }
     }
     stage('build downstream job') {
