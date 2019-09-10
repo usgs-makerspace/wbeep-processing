@@ -1,6 +1,5 @@
 library(data.table)
 library(dplyr)
-library(purrr) # needed for `reduce`
 
 # Processing code to create percentiles for each HRU
 
