@@ -47,7 +47,7 @@ pipeline {
     stage('build downstream job') {
       steps { 
         sh "echo ${params.BRANCH_TAG}"
-        build job: 'tippecanoe build tileset', 
+        build job: 'tippecanoe_build_tileset', 
               parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
               string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
       }
