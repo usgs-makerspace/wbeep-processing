@@ -41,14 +41,14 @@ pipeline {
       steps {
         sh '''
           DOCKER_WORKSPACE=${WORKSPACE}
-          # tippecanoe -zg --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory ${WORKSPACE}/tile_dir_simple5 ${WORKSPACE}/hrus.geojson
+          tippecanoe -zg --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory ${WORKSPACE}/tile_dir_simple5 ${WORKSPACE}/hrus.geojson
           mkdir -p tile_dir_simple5
           '''
       }
     }
     stage('push to S3') {
       steps { 
-        sh 'pwd; ls; aws s3 sync tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5'
+        sh 'aws s3 sync tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5'
       }
     }
     stage('build downstream job') {
