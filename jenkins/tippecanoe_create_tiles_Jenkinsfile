@@ -38,12 +38,15 @@ pipeline {
         } 
       }
       steps {
-        sh 'tippecanoe -zg --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory ${WORKSPACE}/tile_dir_simple5 ${WORKSPACE}/hrus.geojson'
+        sh '''
+          DOCKER_WORKSPACE=${WORKSPACE}
+          tippecanoe -zg --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory ${WORKSPACE}/tile_dir_simple5 ${WORKSPACE}/hrus.geojson
+          '''
       }
     }
     stage('push to S3') {
       steps { 
-        sh 'pwd; ls; aws s3 sync ${WORKSPACE}/tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5'
+        sh 'pwd; ls; aws s3 sync ${DOCKER_WORKSPACE}/tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5'
       }
     }
     stage('build downstream job') {
