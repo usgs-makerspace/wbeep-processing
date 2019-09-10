@@ -20,7 +20,7 @@ pipeline {
                           extensions: [],
                           gitTool: 'Default',
                           submoduleCfg: [],
-                          userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
+                          userRemoteConfigs: [[url: 'https://github.com/wdwatkins/wbeep-processing']]
                         ])
         sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape . --exclude "*" --include "hrus.geojson"'
       }
@@ -30,6 +30,7 @@ pipeline {
         docker {
           image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest'
           alwaysPull true
+          reuseNode true
         } 
       }
       steps {
