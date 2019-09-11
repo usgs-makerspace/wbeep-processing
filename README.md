@@ -33,11 +33,10 @@ If you are a windows user, you may need to run `dos2unix reformat_historic.slurm
 #### Now, execute the steps on Yeti.
 
 1. Login to Yeti, `ssh user@yeti.cr.usgs.gov`
-1. First we need to read and reformat the variable NetCDF files. This can be done in parallel by executing a slurm script. Run `sbatch reformat_historic.slurm` to initiate this. You can monitor their progress by running `squeue -u [username]`.
-1. When the reformatting step is complete, there should be RDS files available for each of the 6 model variables. Now we need to combine them. Start an interactive session `sinteractive -A iidd -p normal -n 1 -t 03:00:00  --mem=120GB` & then start R, by entering `R`. Run `source("combine_historic_records.R")` to combine the data into one file. This step took about XX minutes. Close R using `q()` and don't save the workspace image.
-1. When the step to combine the variables is complete, you should be able to see a file called `combined_variables.rds`. Now you can kick off the parallel job by running `sbatch model_input.slurm`. 
+1. First we need to read and reformat the variable NetCDF files and then combine. I did try setting this up to run in parallel but it actually took longer because it had to save each intermediate variable as an RDS to be used later. Loading them into memory in series and then combining takes less time. To do this, start an interactive session `salloc -A iidd -p normal -n 1 -t 03:00:00  --mem=120GB`. You will need to use the `ncdf4` package so you also need to run `module load R/3.5.1-gcc7.1.0`. Now you can start R, by entering `R`. Run `source("combine_historic_records.R")` to read, reformat, and combine the data into one file. This step took about XX minutes. Close R using `q()` and don't save the workspace image.
+1. When the step to combine the variables is complete, you should be able to see a file called `combined_variables.rds`. Now you can kick off the parallel job by running `sbatch model_input.slurm`. You can monitor their progress by running `squeue -u [username]`.
 1. When that is complete, start an interactive session just as before and run `source("combine_hru_quantiles.R")`. Make sure to use `q()` to leave the R session. 
 
-Note: You can cancel your interactive jobs by running `scancel -u [username]`. Note that this cancels all of your current jobs, which should just be this one job for this process. You won't want to run this if you are simultaneously running jobs for other projects.
+Note: You can cancel your interactive jobs by running `scancel -u [username]`. This cancels all of your current jobs, which should just be this one job for this process. You won't want to run this if you are simultaneously running jobs for other projects.
 
 That should be everything! The resulting quantiles RDS file should be available in the appropriate S3 bucket.
