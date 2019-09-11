@@ -4,11 +4,24 @@ pipeline {
             label 'node:slave'
         }
     }
+  parameters {
+        gitParameter name: 'BRANCH_TAG',
+                     type: 'PT_BRANCH_TAG',
+                     defaultValue: 'master'
+        choice(choices: ['test', 'qa', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+  }
   stages {
     stage('Checkout repo and pull from S3') {
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
-        git "https://github.com/usgs-makerspace/wbeep-processing"
+         checkout([$class: 'GitSCM',
+                          branches: [[name: "${params.BRANCH_TAG}"]],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [],
+                          gitTool: 'Default',
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
+                        ])
         sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape . --exclude "*" --include "hrus.geojson"'
       }
     }
@@ -26,6 +39,14 @@ pipeline {
     stage('push to S3') {
       steps { 
         sh 'aws s3 sync tile_dir_simple5 s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/tile_dir_simple5'
+      }
+    }
+    stage('build downstream job') {
+      steps { 
+        sh "echo ${params.BRANCH_TAG}"
+        build job: 'process_model_output', 
+              parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
+              string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
       }
     }
   }
