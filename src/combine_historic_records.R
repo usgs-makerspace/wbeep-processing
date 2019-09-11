@@ -1,19 +1,44 @@
 library(data.table)
 library(dplyr)
+# library(ncdf4) # doesn't exist on Yeti right now.
 
-read_period_of_record_data <- function(fn) {
+read_period_of_record_data <- function(fn, varid = NULL) {
   
-  data <- fread(fn, header=TRUE)
-  data[, Date := as.Date(Date)]
+  if(is.null(varid)) {
+    # The file is a CSV
+    data <- fread(fn, header=TRUE)
+    data[, Date := as.Date(Date)]
+  } else {
+    # The file is NetCDF
+    nc <- nc_open(fn)
+    
+    message(sprintf("Reading in NetCDF data for %s", varid))
+    data_nc <- ncvar_get(nc, varid)
+    time <- ncvar_get(nc, "time")
+    hruid <- ncvar_get(nc, "hruid")
+    
+    # Convert ncdf4 times to R dates
+    time_att <- ncdf4::ncatt_get(nc, "time")
+    time_start <- as.Date(gsub("days since ", "", time_att$units))
+    time_fixed <- time + time_start # creates dates from the "days since" var
+    
+    # The data is actually transformed and missing hruid and time
+    if(ncol(data_nc) < 109951) {
+      message(sprintf("Transforming data & adding time/hruid attributes for %s", varid))
+      data_transformed <- t(data_nc)
+      data <- cbind(time_fixed, data_transformed)
+      names(data) <- c("Date", hruid)
+    }
+  }
   
-  #### Delete this section for the real deal
-  # For now, just play with 1 year:
-  data[, Year := as.numeric(format(Date, "%Y"))]
-  max_year <- max(data$Year)
-  data_one_yr <- data[Year >= (max_year-1) ]
-  data_one_yr[, Year := NULL]
-  data <- data_one_yr
-  ####
+  ### Delete this section for the real deal
+  # # For now, just play with 1 year:
+  # data[, Year := as.numeric(format(Date, "%Y"))]
+  # max_year <- max(data$Year)
+  # data_one_yr <- data[Year >= (max_year-1) ]
+  # data_one_yr[, Year := NULL]
+  # data <- data_one_yr
+  ###
   
   return(data)
 }
@@ -30,22 +55,39 @@ combine_variables_to_one_df <- function(dflist) {
 }
 
 # Read the data sources ----
-soil_moist_tot <- read_period_of_record_data("nhru_soil_moist_tot.csv")
-pkwater_equiv <- read_period_of_record_data("nhru_pkwater_equiv.csv")
-#hru_intcpstor <- read_period_of_record_data("nhru_hru_intcpstor.csv")
-#hru_impervstor <- read_period_of_record_data("nhru_hru_impervstor.csv")
-#gwres_stor <- read_period_of_record_data("nhru_gwres_stor.csv")
-#dprst_stor <- read_period_of_record_data("nhru_dprst_stor_hru.csv")
+
+# ScienceBase CSV version
+# soil_moist_tot <- read_period_of_record_data("nhru_soil_moist_tot.csv")
+# pkwater_equiv <- read_period_of_record_data("nhru_pkwater_equiv.csv")
+# hru_intcpstor <- read_period_of_record_data("nhru_hru_intcpstor.csv")
+# hru_impervstor <- read_period_of_record_data("nhru_hru_impervstor.csv")
+# gwres_stor <- read_period_of_record_data("nhru_gwres_stor.csv")
+# dprst_stor <- read_period_of_record_data("nhru_dprst_stor_hru.csv")
+
+# NetCDF files from Steve Markstrom
+# soil_moist_tot <- read_period_of_record_data("historical_soil_moist_tot_out.nc", "soil_moist_tot")
+# pkwater_equiv <- read_period_of_record_data("historical_pkwater_equiv_out.nc", "pkwater_equiv")
+# hru_intcpstor <- read_period_of_record_data("historical_hru_intcpstor_out.nc", "hru_intcpstor")
+# hru_impervstor <- read_period_of_record_data("historical_hru_impervstor_out.nc", "hru_impervstor")
+# gwres_stor <- read_period_of_record_data("historical_gwres_stor_out.nc", "gwres_stor")
+# dprst_stor <- read_period_of_record_data("historical_dprst_stor_hru_out.nc", "dprst_stor_hru")
+
+# Identify data ----
+variable_df_filenames <- list.files(pattern = "historic_", full.names = TRUE)
+variable_df_filenames <- variable_df_filenames[grep("\\.rds$", variable_df_filenames)]
 
 # Combine data sources into a single list ----
-variable_df_list <- list(
-  pkwater_equiv = pkwater_equiv,
-  soil_moist_tot = soil_moist_tot#,
-  #hru_intcpstor = hru_intcpstor,
-  #hru_impervstor = hru_impervstor,
-  #gwres_stor = gwres_stor,
-  #dprst_stor = dprst_stor
-)
+variable_df_list <- lapply(variable_df_filenames, readRDS)
+
+
+# variable_df_list <- list(
+#   pkwater_equiv = pkwater_equiv,
+#   soil_moist_tot = soil_moist_tot,
+#   hru_intcpstor = hru_intcpstor,
+#   hru_impervstor = hru_impervstor,
+#   gwres_stor = gwres_stor,
+#   dprst_stor = dprst_stor
+# )
 
 # Combine all variables into one df ----
 variable_df <- combine_variables_to_one_df(variable_df_list)

@@ -7,7 +7,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=lplatt@usgs.gov
 #SBATCH --export=ALL
-#SBATCH --array=1-5 # eventually 1:4399 (109,952 HRUs / 25 HRUs per task = 4,399 tasks)
+#SBATCH --array=1-4399 # eventually 1:4399 (109,952 HRUs / 25 HRUs per task = 4,399 tasks)
 
 mkdir -p logs
 mkdir -p quantiles_by_task
