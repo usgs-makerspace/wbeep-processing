@@ -1,6 +1,8 @@
 library(dplyr)
 library(ncdf4) 
 
+message(sprintf("Started at %s", Sys.time()))
+
 read_period_of_record_data <- function(fn, varid) {
   
   # The file is NetCDF
@@ -37,22 +39,24 @@ combine_variables_to_one_df <- function(dflist) {
 }
 
 # NetCDF files from Steve Markstrom
-# soil_moist_tot <- read_period_of_record_data("historical_soil_moist_tot_out.nc", "soil_moist_tot")
-# pkwater_equiv <- read_period_of_record_data("historical_pkwater_equiv_out.nc", "pkwater_equiv")
-# hru_intcpstor <- read_period_of_record_data("historical_hru_intcpstor_out.nc", "hru_intcpstor")
+soil_moist_tot <- read_period_of_record_data("historical_soil_moist_tot_out.nc", "soil_moist_tot")
+pkwater_equiv <- read_period_of_record_data("historical_pkwater_equiv_out.nc", "pkwater_equiv")
+hru_intcpstor <- read_period_of_record_data("historical_hru_intcpstor_out.nc", "hru_intcpstor")
 hru_impervstor <- read_period_of_record_data("historical_hru_impervstor_out.nc", "hru_impervstor")
 gwres_stor <- read_period_of_record_data("historical_gwres_stor_out.nc", "gwres_stor")
-# dprst_stor <- read_period_of_record_data("historical_dprst_stor_hru_out.nc", "dprst_stor_hru")
+dprst_stor <- read_period_of_record_data("historical_dprst_stor_hru_out.nc", "dprst_stor_hru")
 
 variable_df_list <- list(
-  # pkwater_equiv = pkwater_equiv,
-  # soil_moist_tot = soil_moist_tot,
-  # hru_intcpstor = hru_intcpstor,
+  pkwater_equiv = pkwater_equiv,
+  soil_moist_tot = soil_moist_tot,
+  hru_intcpstor = hru_intcpstor,
   hru_impervstor = hru_impervstor,
-  gwres_stor = gwres_stor#,
-  # dprst_stor = dprst_stor
+  gwres_stor = gwres_stor,
+  dprst_stor = dprst_stor
 )
 
 # Combine all variables into one df ----
 variable_df <- combine_variables_to_one_df(variable_df_list)
 saveRDS(variable_df, "combined_vars.rds")
+
+message(sprintf("Finished at %s", Sys.time()))
