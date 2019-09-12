@@ -34,7 +34,7 @@ pipeline {
       agent {
         docker {
           image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest'
-          registryUrl 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing'
+          registryUrl 'https://code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing'
           registryCredentialsId 'jenkins_ci_access_token'
           alwaysPull true
           reuseNode true
