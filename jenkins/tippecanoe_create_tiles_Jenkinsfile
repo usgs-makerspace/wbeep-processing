@@ -32,8 +32,8 @@ pipeline {
     }
     stage('create tileset') {
       agent {
-        docker {
-          image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest'
+        docker.withRegistry('code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing', 'jenkins_ci_access_token') {
+          docker.image('tippecanoe-latest')
           alwaysPull true
           reuseNode true
         } 
