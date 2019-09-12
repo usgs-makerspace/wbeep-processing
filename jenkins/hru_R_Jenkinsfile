@@ -12,7 +12,6 @@ pipeline {
   }
   stages {
     stage('Checkout repo and pull from S3') {
-      agent any 
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
         checkout([$class: 'GitSCM',
@@ -30,24 +29,28 @@ pipeline {
       agent {
         docker {
           image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:R-latest'
+          registryUrl 'https://code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing'
+          registryCredentialsId 'jenkins_ci_access_token'
           alwaysPull true
+          reuseNode true
         } 
       }
       steps {
         sh 'Rscript -e "source(\'src/process_hru_shapes.R\')"'
-        sh 'ogr2ogr -f GeoJSON hrus.geojson -lco COORDINATE_PRECISION=5 -lco ID_FIELD=hru_id_2 hru_reduced_valid.shp'
+        sh 'ogr2ogr -f GeoJSON hrus.geojson -lco ID_FIELD=hru_id_2 hru_reduced_valid.shp'
       }
     }
     stage('push to S3') {
-      agent any
       steps { 
-        sh 'aws s3 cp hrus.geojson s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/hrus.geojson --content-type "application/json"'
+        sh '''
+          aws s3 cp hrus.geojson s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/hrus.geojson --content-type "application/json"
+          '''
       }
     }
     stage('build downstream job') {
       steps { 
         sh "echo ${params.BRANCH_TAG}"
-        build job: 'tippecanoe build tileset', 
+        build job: 'tippecanoe_build_tileset', 
               parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
               string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
       }
