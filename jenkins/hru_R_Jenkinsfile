@@ -14,7 +14,6 @@ pipeline {
     stage('Checkout repo and pull from S3') {
       agent any 
       steps {
-        sh 'aws s3 cp ./ s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/ --exclude "*" --include "hru_reduced_valid.*"'
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
         checkout([$class: 'GitSCM',
                           branches: [[name: "${params.BRANCH_TAG}"]],
@@ -44,7 +43,6 @@ pipeline {
       steps { 
         sh '''
           aws s3 cp hrus.geojson s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/hrus.geojson --content-type "application/json"
-          aws s3 cp hru_reduced_valid.shp s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/hru_reduced_valid.shp
           '''
       }
     }
