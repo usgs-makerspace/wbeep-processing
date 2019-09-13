@@ -4,11 +4,11 @@
 library(dplyr)
 library(purrr) # needed for `reduce`
 
-files_to_combine <- list.files(path = "quantiles_by_task", 
+files_to_combine <- list.files(path = "quantiles_by_hru", 
                                pattern = "total_storage_quantiles",
                                full.names = TRUE)
 list_of_files <- lapply(files_to_combine, readRDS)
 combined_data <- reduce(list_of_files, left_join)
 
-saveRDS(combined_data, "all_quantiles.rds")
-## [code to push to S3 goes here]
+saveRDS(combined_data, sprintf("all_quantiles-%s.rds", Sys.Date()))
+## manually push RDS file to S3

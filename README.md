@@ -21,19 +21,19 @@ This happens very infrequently, so we currently have it as a manual step running
 
 Load data and scripts onto Yeti (yeti.cr.usgs.gov, AD login). Include all 6 model component historic record files with the pattern `historical_[var name]_out.nc`). Also load all scripts needed (see list below). Lindsay used WinSCP to do this step. It took a long time (hours!).
 
-* `combine_historic_records.R`, 
+* `split_historic_data.R`, 
+* `split_historic_data.slurm`, 
 * `process_quantiles_by_hru.R`, 
-* `combine_hru_quantiles.R`, and 
-* `model_input.slurm`. 
+* `process_quantiles_by_hru.slurm`
+* `combine_hru_quantiles.R`, and
+* `combine_hru_quantiles.slurm`.
 
 #### Now, execute the steps on Yeti.
 
 1. Login to Yeti, `ssh user@yeti.cr.usgs.gov`
-1. First we need to read and reformat the variable NetCDF files and then combine. I did try setting this up to run in parallel but it actually took longer because it had to save each intermediate variable as an RDS to be used later. Loading them into memory in series and then combining takes less time. To do this, start an interactive session `salloc -A iidd -p normal -n 1 -t 03:00:00 --mem=120GB`. You will need to use the `ncdf4` package so you also need to run `module load R/3.5.1-gcc7.1.0`. Now you can start R, by entering `R`. Run `source("combine_historic_records.R")` to read, reformat, and combine the data into one file. This step took about XX minutes. Close R using `q()` and don't save the workspace image.
-1. Stop your interactive job by running `scancel [job id]`. You can find the job id by scrolling up past the ASCII Yeti & cluster info and reading the job startup messages.
-1. If you are a windows user, you may need to run `dos2unix model_input.slurm` before continuing to make the line endings correct.
-1. When the step to combine the variables is complete, you should be able to see a file called `combined_variables.rds`. Now you can kick off the parallel job by running `sbatch model_input.slurm`. You can monitor their progress by running `squeue -u [username]`.
-1. When that is complete, start an interactive session just as before and run `source("combine_hru_quantiles.R")`. Make sure to use `q()` to leave the R session. 
-1. Stop your interactive job by running `scancel [job id]`. You can find the job id by scrolling up past the ASCII Yeti & cluster info and reading the job startup messages.
+1. If you are a windows user, you may need to run `dos2unix split_historic_data.slurm` before continuing to make the line endings correct for each of the `.slurm` files before using them.
+1. First we need to read and reformat the variable NetCDF files and then split into a file for each HRU for each variable. To do so, run `sbatch split_historic_data.slurm`. You should see a `cache` folder, which will have 659,706 small RDS files when complete.
+1. When the step to split the historic data is complete, you can kick off the job that processes the percentiles by running `sbatch process_quantiles_by_hru.slurm`. You can monitor their progress by running `squeue -u [username]`.
+1. When that is complete, you can kick off the final process which will combine all of HRU files into one quantiles file called `all_quantiles-[date].rds`. To start, execute `sbatch combine_hru_quantiles.slurm`.
 
-That should be everything! The resulting quantiles RDS file should be available in the appropriate S3 bucket.
+That should be everything! The resulting quantiles RDS file will need to be manually uploaded to the appropriate S3 bucket. You can now delete the files on your Yeti root directory (and you should to free up space).
