@@ -46,8 +46,8 @@ task_var <- vars[task_id]
 task_var_df <- read_period_of_record_data(sprintf("historical_%s_out.nc", task_var), task_var)
 
 message(sprintf("Started saving individual files per HRU for %s at %s", task_var, Sys.time()))
-for(i in (2:ncol(task_var_df))) {
-  task_var_df_i <- as.data.frame(task_var_df[,c(1, i)])
+for(i in 1:(ncol(task_var_df)-1)) {
+  task_var_df_i <- as.data.frame(task_var_df[,c(1, (i+1))])
   saveRDS(task_var_df_i, sprintf("cache/%s_%s.rds", task_var, i))
 }
 
