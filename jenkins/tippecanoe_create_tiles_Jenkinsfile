@@ -1,7 +1,7 @@
 pipeline {
   agent {
         node {
-            label 'node:slave'
+            label 'team:makerspace'
         }
     }
   parameters {
@@ -11,6 +11,11 @@ pipeline {
         choice(choices: ['test', 'qa', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
   }
   stages {
+    stage('Clean Workspace') {
+	    steps{
+		    cleanWs()
+	    }
+	  }
     stage('Checkout repo and pull from S3') {
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
@@ -29,11 +34,16 @@ pipeline {
       agent {
         docker {
           image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest'
+          registryUrl 'https://code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing'
+          registryCredentialsId 'jenkins_ci_access_token'
           alwaysPull true
+          reuseNode true
         } 
       }
       steps {
-        sh 'tippecanoe -zg --no-feature-limit --no-tile-size-limit --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory tile_dir_simple5 hrus.geojson'
+        sh '''
+          tippecanoe -zg --no-feature-limit --no-tile-size-limit --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory tile_dir_simple5 hrus.geojson
+          '''
       }
     }
     stage('push to S3') {
