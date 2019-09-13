@@ -22,27 +22,28 @@ combine_vars_to_total_storage_df <- function(hruid) {
   # Read all 6 vars
   vars <- c("soil_moist_tot", "pkwater_equiv", "hru_intcpstor", 
             "hru_impervstor", "gwres_stor", "dprst_stor_hru")
-  hru_files <- sprintf("cache_feather/%s_%s.feather", vars, hruid)
-  hru_df <- bind_rows(lapply(hru_files, read_feather))
+  hru_files <- sprintf("cache/%s_%s.rds", vars, hruid)
+  hru_df <- bind_rows(lapply(hru_files, readRDS))
   
-  hru_df <- hru_df %>% 
-    mutate(Date = as.Date(time_fixed, origin = "1970-01-01")) %>%
-    select(Date, everything(), -time_fixed) 
+  hru_df$Date <- as.Date(hru_df$time_fixed, origin = "1970-01-01")
+  hru_df$time_fixed <- NULL
   
   # Rename column with values to hru id
   names(hru_df)[!grepl("Date", names(hru_df))] <- "values"
   
   # Sum rows to get the "total storage" value for each day
-  total_storage_hru_df <- hru_df %>% 
-    group_by(Date) %>% 
-    summarize(total_storage = sum(values)) %>% 
-    select(Date, !!hruid := total_storage)
+  total_storage_hru_df <- hru_df %>%
+    group_by(Date) %>%
+    summarize(total_storage = sum(values))
+  
+  # Rename column with values back to hru id
+  names(total_storage_hru_df)[!grepl("Date", names(total_storage_hru_df))] <- hruid
   
   return(total_storage_hru_df)
 }
 
 # Function to calculate the percentiles associated with a set of HRUs ----
-calcuate_percentiles <- function(total_storage_df) {
+calcuate_percentiles <- function(total_storage_df, hruid) {
   
   # Add column with numeric DOY
   total_storage_df$DOY <- as.numeric(format(total_storage_df$Date, "%j"))
@@ -91,6 +92,8 @@ calcuate_percentiles <- function(total_storage_df) {
   return(hru_quantiles)
 }
 
+message(sprintf("Started task at %s", Sys.time()))
+
 # Identify task id from yeti environment & convert to HRU ids ----
 task_id <- as.numeric(Sys.getenv('SLURM_ARRAY_TASK_ID', 'NA'))
 
@@ -105,13 +108,18 @@ hru_id_end <- ifelse(hru_id_end > n_hrus,
                      yes = n_hrus,
                      no = hru_id_end)
 
+message(sprintf("Task %s", task_id))
+message(sprintf("starting with %s and ending with %s", hru_id_start, hru_id_end))
+
 hrus_to_loop_through <- hru_id_start:hru_id_end
 
 # For each HRU, calculate the percentiles and save a file ----
-hru_quantile_list <- lapply(hrus_to_loop_through[1:2], function(hruid) {
+hru_quantile_list <- lapply(hrus_to_loop_through, function(hruid) {
   hruid <- as.character(hruid)
   total_storage_df <- combine_vars_to_total_storage_df(hruid)
-  hru_quantile_df <- calcuate_percentiles(total_storage_df)
+  hru_quantile_df <- calcuate_percentiles(total_storage_df, hruid)
   saveRDS(hru_quantile_df, sprintf("quantiles_by_hru/total_storage_quantiles_%s.rds", hruid))
   return(hru_quantile_df)
 })
+
+message(sprintf("Completed task at %s", Sys.time()))

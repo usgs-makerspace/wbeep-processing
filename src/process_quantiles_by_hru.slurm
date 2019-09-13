@@ -7,9 +7,9 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=lplatt@usgs.gov
 #SBATCH --export=ALL
-#SBATCH --array=1-2 # eventually 1:50 (109,951 HRUs / 50 tasks = 2200 HRUs per task)
+#SBATCH --array=1-50 # eventually 1:50 (109,951 HRUs / 50 tasks = 2200 HRUs per task)
 
 mkdir -p logs
-mkdir -p quantiles_by_task
+mkdir -p quantiles_by_hru
 
 Rscript --verbose -e  'source("process_quantiles_by_hru.R")' > logs/${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}.Rlog 2>&1
