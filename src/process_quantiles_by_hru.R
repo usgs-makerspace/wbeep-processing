@@ -115,14 +115,20 @@ hrus_to_loop_through <- hru_id_start:hru_id_end
 
 # For each HRU, calculate the percentiles and save a file ----
 hru_quantile_list <- lapply(hrus_to_loop_through, function(hruid) {
-  hruid <- as.character(hruid)
-  total_storage_df <- combine_vars_to_total_storage_df(hruid)
-  hru_quantile_df <- calcuate_percentiles(total_storage_df, hruid)
-  
-  # Need to save inside this so that they don't run out of memory.
-  message(sprintf("Saving the percentile df, %s", Sys.time()))
-  saveRDS(hru_quantile_df, sprintf("quantiles_by_hru/total_storage_quantiles_%s.rds", hruid))
-  return(hru_quantile_df)
+  hruid_fn <- sprintf("quantiles_by_hru/total_storage_quantiles_%s.rds", hruid)
+  if(!file.exists(hruid_fn)) {
+    hruid <- as.character(hruid)
+    total_storage_df <- combine_vars_to_total_storage_df(hruid)
+    hru_quantile_df <- calcuate_percentiles(total_storage_df, hruid)
+    
+    # Need to save inside this so that they don't run out of memory.
+    message(sprintf("Saving the percentile df for %s at %s", hruid, Sys.time()))
+    saveRDS(hru_quantile_df, hruid_fn)
+    return(hru_quantile_df)
+  } else {
+    message(sprintf("Skipping %s, already complete", hruid))
+    return()
+  }
 })
 
 message(sprintf("Completed task at %s", Sys.time()))
