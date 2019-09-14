@@ -98,7 +98,7 @@ message(sprintf("Started task at %s", Sys.time()))
 task_id <- as.numeric(Sys.getenv('SLURM_ARRAY_TASK_ID', 'NA'))
 
 # Convert task id to HRU ids (increment by n_hrus_per_task)
-n_hrus_per_task <- 2200
+n_hrus_per_task <- 1100
 hru_id_start <- ((task_id-1)*n_hrus_per_task + 1) # tells you which HRU
 hru_id_end <- hru_id_start + (n_hrus_per_task-1) # gives location of final col
 
@@ -118,6 +118,9 @@ hru_quantile_list <- lapply(hrus_to_loop_through, function(hruid) {
   hruid <- as.character(hruid)
   total_storage_df <- combine_vars_to_total_storage_df(hruid)
   hru_quantile_df <- calcuate_percentiles(total_storage_df, hruid)
+  
+  # Need to save inside this so that they don't run out of memory.
+  message(sprintf("Saving the percentile df, %s", Sys.time()))
   saveRDS(hru_quantile_df, sprintf("quantiles_by_hru/total_storage_quantiles_%s.rds", hruid))
   return(hru_quantile_df)
 })
