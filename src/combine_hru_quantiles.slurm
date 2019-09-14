@@ -8,7 +8,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=lplatt@usgs.gov
 #SBATCH --export=ALL
-#SBATCH --array=1 # don't need this to be parallel
+#SBATCH --array=0 # don't need this to be parallel
 
 mkdir -p logs
 
