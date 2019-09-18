@@ -19,7 +19,7 @@ This happens very infrequently, so we currently have it as a manual step running
 
 #### First, setup Yeti for these calculations.
 
-Load data and scripts onto Yeti (yeti.cr.usgs.gov, AD login). Include all 6 model component historic record files with the pattern `historical_[var name]_out.nc`). Also load all scripts needed (see list below). Lindsay used WinSCP to do this step. It took a long time (hours!).
+Load data and scripts onto Yeti (yeti.cr.usgs.gov, AD login). Include all 6 model component historic record files with the pattern `historical_[var name]_out.nc`). Also load all scripts needed (see list below). Lindsay used WinSCP to do this step. It took a long time (hours!). If Lindsay or Megan still have the files in their user account (/home/lplatt or /home/mhines) you can just copy the files to your own home dir from within one of those directories with `cp *.R /home/<yourhomedir>` and `cp *.slurm /home/<yourhomedir>`
 
 * `split_historic_data.R`, 
 * `split_historic_data.slurm`, 
@@ -32,6 +32,8 @@ Load data and scripts onto Yeti (yeti.cr.usgs.gov, AD login). Include all 6 mode
 
 1. Login to Yeti, `ssh user@yeti.cr.usgs.gov`
 1. If you are a windows user, you may need to run `dos2unix split_historic_data.slurm` before continuing to make the line endings correct for each of the `.slurm` files before using them.
+1. Enter the R environment and install the ncdf4 package. Type `R` at the command prompt and then `install.packages("ncdf4")` once you're in the environment, hit enter, type `yes` to create a personal library, pick a CRAN mirror, and ensure that the package installs. To quit R, type `q()`, and choose whether or not to save the session.
+1. Edit each *.slurm script to include your email adress and your account information, otherwise you will see an error `sbatch: error: Batch job submission failed: Invalid account or account/partition combination specified`
 1. First we need to read and reformat the variable NetCDF files and then split into a file for each HRU for each variable. To do so, run `sbatch split_historic_data.slurm`. You should see a `cache` folder, which will have 659,706 small RDS files when complete. You can manually monitor progress by counting how many files are currently in the folder by running `ls -1 cache | wc -l`. This process took about 2 hours for all tasks to finish on 9/13/2019.
 1. When the step to split the historic data is complete, you can kick off the job that processes the percentiles by running `sbatch process_quantiles_by_hru.slurm`. You can monitor their progress by running `squeue -u [username]`. THIS IS EXTREMELY SLOW. Haven't run the full thing, but would take 12 hours by my estimate. Sometimes it would still run out of memory (maybe I should use `for` instead of `lapply`?) so I would just have to kick it off again. It skips files that already exist, so it gets to move forward, just kind of annoying. To monitor progress as it goes, you can run `ls -1 quantiles_by_hru | wc -l` to see how many files are in the folder. There should be 109,951.
 1. When that is complete, you can kick off the final process which will combine all of HRU files into one quantiles file called `all_quantiles-[date].rds`. To start, execute `sbatch combine_hru_quantiles.slurm`.
