@@ -19,7 +19,7 @@ This happens very infrequently, so we currently have it as a manual step running
 
 #### First, setup Yeti for these calculations.
 
-Load data and scripts onto Yeti (yeti.cr.usgs.gov, AD login). Include all 6 model component historic record files with the pattern `historical_[var name]_out.nc`). Also load all scripts needed (see list below). Lindsay used WinSCP to do this step. It took a long time (hours!). If Lindsay or Megan still have the files in their user account (/home/lplatt or /home/mhines) you can just copy the files to your own home dir from within one of those directories with `cp *.R /home/<yourhomedir>` and `cp *.slurm /home/<yourhomedir>`
+Load data and scripts onto Yeti (yeti.cr.usgs.gov, AD login). Include all 6 model component historic record files with the pattern `historical_[var name]_out.nc`). Also load all scripts needed (see list below). Lindsay used WinSCP to do this step. It took a long time (hours!). If Lindsay or Megan still have the files in their user account (/home/lplatt or /home/mhines) you can just copy the files to your own home dir from within one of those directories with `cp *.R /home/<yourhomedir>` and `cp *.slurm /home/<yourhomedir>` and `cp *.nc /home/<yourhomedir>`
 
 * `split_historic_data.R`, 
 * `split_historic_data.slurm`, 
