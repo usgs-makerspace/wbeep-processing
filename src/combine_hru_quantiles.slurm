@@ -3,7 +3,7 @@
 #SBATCH -c 1                   # number of cores per task
 #SBATCH -p normal              # the partition you want to use, for this case prod is best
 #SBATCH -A iidd                 # your account
-#SBATCH --time=03:00:00        # time at which the process will be cancelled if unfinished
+#SBATCH --time=05:00:00        # time at which the process will be cancelled if unfinished
 #SBATCH --mem=120GB
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=lplatt@usgs.gov
