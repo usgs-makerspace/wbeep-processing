@@ -12,5 +12,5 @@ list_of_files <- lapply(files_to_combine, readRDS)
 combined_data <- reduce(list_of_files, left_join)
 combined_data_reformatted <- gather(combined_data, key = hruid, value = total_storage_quantiles, -DOY)
 
-saveRDS(combined_data, "all_quantiles.rds")
+saveRDS(combined_data_reformatted, "all_quantiles.rds")
 ## manually push RDS file to S3
