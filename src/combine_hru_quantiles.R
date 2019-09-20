@@ -4,12 +4,10 @@
 library(dplyr)
 library(purrr) # needed for `reduce`
 library(tidyr)
-library(gtools)
 
-files_to_combine <- list.files(path = "quantiles_by_hru", 
-                               pattern = "total_storage_quantiles",
-                               full.names = TRUE)
-stack <- do.call("smartbind", lapply(files_to_combine, readRDS))
+
+files <- list.files(path = "src/quantiles_by_hru", pattern = "total_storage_quantiles", full.names = TRUE)
+stack <- do.call("bind_rows", lapply(files, readRDS))
 combined_data_reformatted <- gather(stack, key = hruid, value = total_storage_quantiles, -DOY)
 
 saveRDS(combined_data_reformatted, "all_quantiles.rds")
