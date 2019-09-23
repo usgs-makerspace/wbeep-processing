@@ -5,10 +5,12 @@ library(dplyr)
 library(purrr) # needed for `reduce`
 library(tidyr)
 
-
-files <- list.files(path = "src/quantiles_by_hru", pattern = "total_storage_quantiles", full.names = TRUE)
-stack <- do.call("bind_rows", lapply(files, readRDS))
-combined_data_reformatted <- gather(stack, key = hruid, value = total_storage_quantiles, -DOY)
+files_to_combine <- list.files(path = "quantiles_by_hru",
+                               pattern = "total_storage_quantiles",
+                               full.names = TRUE)
+list_of_files <- lapply(files_to_combine, readRDS)
+combined_data <- reduce(list_of_files, left_join)
+combined_data_reformatted <- gather(combined_data, key = hruid, value = total_storage_quantiles, -DOY)
 
 saveRDS(combined_data_reformatted, "all_quantiles.rds")
 ## manually push RDS file to S3
