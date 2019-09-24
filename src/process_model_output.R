@@ -3,6 +3,7 @@ library(dplyr)
 
 args <- commandArgs(trailingOnly=TRUE)
 today <- args[1]
+todayUnderscores <- gsub("-","_",today)
 
 #### Code for total storage daily build
 #This section is code for what I think will replace the precip code when the percentile code is complete.
@@ -14,7 +15,7 @@ vars <- c("soil_moist_tot", "pkwater_equiv", "hru_intcpstor",
           "hru_impervstor", "gwres_stor", "dprst_stor_hru")
 
 var_data_list <- lapply(vars, function(var) {
-  nc <- nc_open(sprintf("%s_%s_out.nc", today, var))
+  nc <- nc_open(sprintf("%s_%s_out.nc", todayUnderscores, var))
   time <- ncvar_get(nc, varid = "time")
   hruids <- ncvar_get(nc, varid = "hruid")
 
@@ -29,7 +30,7 @@ var_data_list <- lapply(vars, function(var) {
   today_var_data <- data.frame(
     hruid = as.character(hruids),
     var_values = today_data_nc,
-    DOY = as.numeric(format(today, "%j"))
+    DOY = as.numeric(format(as.Date(today), "%j"))
   )
 
   return(today_var_data)
@@ -51,8 +52,8 @@ find_quantile_group <- function(value, breaks, labels) {
 
 percentile_categories <- c("very low", "low", "average", "high", "very high")
 values_categorized <- total_storage_data %>%
-  left_join(quantile_df, by = c("hruid", "DOY")) %>%
-  mutate(map_cat = find_value_category(total_storage_today, total_storage_quantiles, percentile_categories)) %>%
+  left_join(quantile_df, by = c("hruid")) %>%
+  mutate(map_cat = find_quantile_group(total_storage_data$total_storage_today, total_storage_quantiles, percentile_categories)) %>%
   select(hru_id_nat = hruid,
          value = as.character(map_cat))
 
