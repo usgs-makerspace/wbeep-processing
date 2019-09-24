@@ -37,7 +37,6 @@ pipeline {
         sh 'DATE=2019_08_22; wget https://prod-owi-resources/resources/Application/wbeep/model_output/${DATE}_pkwater_equiv_out.nc'
         sh 'DATE=2019_08_22; wget https://prod-owi-resources/resources/Application/wbeep/model_output/${DATE}_soil_moist_tot_out.nc'
       }
-      }
     }
     stage('convert model output to csv for tile-join') {
       agent {
