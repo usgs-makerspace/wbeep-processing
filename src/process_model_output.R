@@ -53,13 +53,13 @@ find_quantile_group <- function(value, breaks, labels) {
 percentile_categories <- c("very low", "low", "average", "high", "very high")
 values_categorized <- total_storage_data %>%
   left_join(quantile_df, by = c("hruid")) %>%
-  mutate(map_cat = find_quantile_group(total_storage_data$total_storage_today, total_storage_quantiles, percentile_categories)) %>%
+  mutate(map_cat = find_quantile_group(total_storage_today, total_storage_quantiles, percentile_categories)) %>%
   select(hru_id_nat = hruid,
          value = as.character(map_cat))
 
 readr::write_csv(values_categorized, "model_output_categorized.csv")
 
-nc <- nc_open(paste0('climate_', today, ".nc"))
+nc <- nc_open(paste0('climate_', todayUnderscores, ".nc"))
 hru_ids <- ncvar_get(nc, varid = "hruid")
 #could verify time axis matches expected date
 #generate random labels for now
