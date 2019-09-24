@@ -36,7 +36,6 @@ pipeline {
         sh 'DATE=2019_08_22; wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_hru_intcpstor_out.nc'
         sh 'DATE=2019_08_22; wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_pkwater_equiv_out.nc'
         sh 'DATE=2019_08_22; wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_soil_moist_tot_out.nc'
-		https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/2019_08_22_soil_moist_tot_out.nc
       }
     }
     stage('convert model output to csv for tile-join') {
