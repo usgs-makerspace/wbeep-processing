@@ -10,8 +10,8 @@ today <- args[1]
 #today <- "2019-07-31"
 
 # Combine nc files for each var
-vars <- c("soil_moist_tot", "pkwater_equiv", "hru_intcpstor",
-          "hru_impervstor", "gwres_stor", "dprst_stor_hru")
+vars <- c("soil_moist_tot_out", "pkwater_equiv_out", "hru_intcpstor_out",
+          "hru_impervstor_out", "gwres_stor_out", "dprst_stor_hru_out")
 
 var_data_list <- lapply(vars, function(var) {
   nc <- nc_open(sprintf("%s_%s_out.nc", today, var))
