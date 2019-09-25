@@ -1,6 +1,7 @@
 library(ncdf4)
 library(dplyr)
 library(tidyverse)
+library(purrr)
 
 args <- commandArgs(trailingOnly=TRUE)
 today <- args[1]
