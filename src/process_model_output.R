@@ -1,5 +1,6 @@
 library(ncdf4)
 library(dplyr)
+library(tidyverse)
 
 args <- commandArgs(trailingOnly=TRUE)
 today <- args[1]
@@ -8,7 +9,8 @@ todayUnderscores <- gsub("-","_",today)
 #### Code for total storage daily build
 #This section is code for what I think will replace the precip code when the percentile code is complete.
 # test for now b/c of the data we have
-#today <- "2019-07-31"
+
+today <- "2019-07-31"
 
 # Combine nc files for each var
 vars <- c("soil_moist_tot", "pkwater_equiv", "hru_intcpstor",
@@ -43,6 +45,10 @@ total_storage_data <- var_data_all %>%
 
 # Read in quantile data
 quantile_df <- readRDS("all_quantiles.rds")
+
+quantile_df %>% 
+  dplyr::mutate(total_storage_quantiles=purrr::map(total_storage_quantiles, setNames, c("0%","10%","25%","75%","90%", "100%"))) %>% 
+  unnest_wider(total_storage_quantiles)
 
 # Join quantiles to values by hruid
 # mutate a column to get category
