@@ -4,7 +4,7 @@ library(dplyr)
 library(tidyr)
 library(pryr)
 ptm <- proc.time()
-files_to_combine <- list.files(path = "quantiles_by_hru", 
+files_to_combine <- list.files(path = "src/quantiles_by_hru", 
                                pattern = "total_storage_quantiles",
                                full.names = TRUE)
 #gets daily data
@@ -28,5 +28,10 @@ combined_data <- do.call("bind_cols", file_contents_list) %>%
                values_to = "total_storage_quantiles")
 print(pryr::object_size(combined_data))
 print(proc.time() - ptm)
-saveRDS(combined_data, "all_quantiles.rds")
+
+combined_data_unnested <- combined_data %>%
+  dplyr::mutate(total_storage_quantiles=purrr::map(total_storage_quantiles, setNames, c("0%","10%","25%","75%","90%", "100%"))) %>%
+  unnest_wider(total_storage_quantiles)
+
+saveRDS(combined_data_unnested, "all_quantiles.rds")
 ## manually push RDS file to S3
