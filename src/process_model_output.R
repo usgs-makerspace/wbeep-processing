@@ -40,7 +40,8 @@ var_data_list <- lapply(vars, function(var) {
 var_data_all <- bind_rows(var_data_list)
 total_storage_data <- var_data_all %>%
   group_by(hruid) %>%
-  summarize(total_storage_today = sum(var_values))
+  summarize(total_storage_today = sum(var_values)) 
+total_storage_data$DOY <- as.numeric(format(as.Date(today), "%j"))
 
 # Read in quantile data
 quantile_df <- readRDS("all_quantiles.rds")
@@ -54,7 +55,7 @@ find_quantile_group <- function(value, breaks, labels) {
 percentile_categories <- c("very low", "low", "average", "high", "very high")
 
 values_categorized <- total_storage_data %>%
-  left_join(quantile_df_small, by = c("hruid")) %>%
+  left_join(quantile_df, by = c("hruid","DOY")) %>%
   mutate(map_cat = find_quantile_group(total_storage_today, total_storage_quantiles, percentile_categories)) %>%
   select(hru_id_nat = hruid,
          value = as.character(map_cat))
