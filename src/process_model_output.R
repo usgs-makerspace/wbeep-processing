@@ -3,12 +3,13 @@ library(dplyr)
 
 args <- commandArgs(trailingOnly=TRUE)
 today <- args[1]
-todayUnderscores <- gsub("-","_",today)
+#todayUnderscores <- gsub("-","_",today)
 
 #### Code for total storage daily build
 #This section is code for what I think will replace the precip code when the percentile code is complete.
 # test for now b/c of the data we have
-#today <- "2019-07-31"
+today <- "2019-07-31"
+todayUnderscores <- gsub("-","_",today)
 
 # Combine nc files for each var
 vars <- c("soil_moist_tot", "pkwater_equiv", "hru_intcpstor",
@@ -51,25 +52,11 @@ find_quantile_group <- function(value, breaks, labels) {
 }
 
 percentile_categories <- c("very low", "low", "average", "high", "very high")
+
 values_categorized <- total_storage_data %>%
-  left_join(quantile_df, by = c("hruid")) %>%
+  left_join(quantile_df_small, by = c("hruid")) %>%
   mutate(map_cat = find_quantile_group(total_storage_today, total_storage_quantiles, percentile_categories)) %>%
   select(hru_id_nat = hruid,
          value = as.character(map_cat))
 
 readr::write_csv(values_categorized, "model_output_categorized.csv")
-
-nc <- nc_open(paste0('climate_', todayUnderscores, ".nc"))
-hru_ids <- ncvar_get(nc, varid = "hruid")
-#could verify time axis matches expected date
-#generate random labels for now
-#actual metric computation happens here eventually
-vals <- ncvar_get(nc, varid = "prcp")
-vals_without_zeros <- vals[vals != 0]
-percentiles <- quantile(vals_without_zeros, probs = c(0.10, 0.30, 0.70, 0.90, 1))
-percentiles <- c(0, percentiles)
-categories <- c("very low", "low", "medium", "high", "very high")
-vals_categorized <- cut(vals, breaks = percentiles, labels = categories, include.lowest = TRUE)
-data_vals <- dplyr::tibble(hru_id_nat = hru_ids, 
-                           value = as.character(vals_categorized))
-readr::write_csv(data_vals, "model_output_categorized.csv")
