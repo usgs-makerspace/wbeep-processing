@@ -3,6 +3,7 @@
 library(dplyr)
 library(tidyr)
 library(pryr)
+library(data.table)
 ptm <- proc.time()
 files_to_combine <- list.files(path = "src/quantiles_by_hru", 
                                pattern = "total_storage_quantiles",
@@ -29,9 +30,11 @@ combined_data <- do.call("bind_cols", file_contents_list) %>%
 print(pryr::object_size(combined_data))
 print(proc.time() - ptm)
 
-combined_data_unnested <- combined_data %>%
-  dplyr::mutate(total_storage_quantiles=purrr::map(total_storage_quantiles, setNames, c("0%","10%","25%","75%","90%", "100%"))) %>%
-  unnest_wider(total_storage_quantiles)
+#NOTE: data.table package can modify objects in place!
+#that's why there is no explicit assignments here
+setDT(combined_data)
+combined_data[, c("0%", "10%", "25%", "75%", "90%", "100%") := transpose(total_storage_quantiles)]
+combined_data[,total_storage_quantiles := NULL]
 
-saveRDS(combined_data_unnested, "all_quantiles.rds")
+saveRDS(combined_data, "all_quantiles.rds")
 ## manually push RDS file to S3
