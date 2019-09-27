@@ -43,10 +43,41 @@ total_storage_data <- var_data_all %>%
 # Read in quantile data
 quantile_df <- readRDS("all_quantiles.rds")
 
-# Join quantiles to values by hruid
-# mutate a column to get category
-find_quantile_group <- function(value, breaks, labels) {
-  cut(value, unique(breaks), unique(labels)[-1], include.lowest = TRUE)
+get_nonzero_duplicate_indices <- function(x) {
+  zeros <- x == 0
+  dups <- duplicated(x, fromLast = TRUE)
+  !zeros & dups 
+}
+
+find_value_category <- function(value, labels, ...) {
+  breaks <- as.numeric(list(...))
+  #first, check if there are non-zero duplicate quantiles
+  dup_indices <- get_nonzero_duplicate_indices(breaks)
+  if(any(dup_indices)) {
+    breaks <- breaks[!dup_indices]
+    labels <- labels[-which(dup_indices)]
+  }
+  #if all zeros, mark as undefined
+  if(value == 0 && sum(breaks[2:5]) == 0) {
+    final_label <- "Undefined"
+  } else if(value == 0 && sum(breaks == 0) > 0){ 
+    #if only some are zeros and value is zero, use highest zero tier
+    high_zero_index <- max(which(breaks == 0))
+    if(high_zero_index >= 3) {
+      final_label <- labels[3]
+    } else {
+      final_label <- labels[high_zero_index]
+    } 
+  } else if(value > 0 && sum(breaks == 0) > 0) {
+    high_zero_index <- max(which(breaks == 0))
+    breaks <- breaks[high_zero_index:length(breaks)]
+    labels <- labels[high_zero_index:length(labels)]
+    final_label <- cut(value, breaks, labels, include.lowest = TRUE)
+  } else {
+    final_label <- cut(value, breaks, labels, include.lowest = TRUE)
+  }
+  final_label <- as.character(final_label)
+  return(final_label)
 }
 
 percentile_categories <- c("very low", "low", "average", "high", "very high")
@@ -65,8 +96,9 @@ hru_ids <- ncvar_get(nc, varid = "hruid")
 #actual metric computation happens here eventually
 vals <- ncvar_get(nc, varid = "prcp")
 vals_without_zeros <- vals[vals != 0]
-percentiles <- quantile(vals_without_zeros, probs = c(0.10, 0.30, 0.70, 0.90, 1))
-percentiles <- c(0, percentiles)
+percentiles <- quantile(vals_without_zeros, 
+                        probs = c(0.10, 0.30, 0.70, 0.90))
+percentiles <- c(-Inf, percentiles, Inf)
 categories <- c("very low", "low", "medium", "high", "very high")
 vals_categorized <- cut(vals, breaks = percentiles, labels = categories, include.lowest = TRUE)
 data_vals <- dplyr::tibble(hru_id_nat = hru_ids, 
