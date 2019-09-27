@@ -5,7 +5,7 @@ library(tidyr)
 library(pryr)
 library(data.table)
 ptm <- proc.time()
-files_to_combine <- list.files(path = "src/quantiles_by_hru", 
+files_to_combine <- list.files(path = "quantiles_by_hru", 
                                pattern = "total_storage_quantiles",
                                full.names = TRUE)
 #gets daily data
