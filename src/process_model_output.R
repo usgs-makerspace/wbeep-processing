@@ -3,7 +3,6 @@ library(dplyr)
 
 args <- commandArgs(trailingOnly=TRUE)
 today <- args[1]
-#todayUnderscores <- gsub("-","_",today)
 
 #### Code for total storage daily build
 #This section is code for what I think will replace the precip code when the percentile code is complete.
@@ -39,9 +38,8 @@ var_data_list <- lapply(vars, function(var) {
 
 var_data_all <- bind_rows(var_data_list)
 total_storage_data <- var_data_all %>%
-  group_by(hruid) %>%
+  group_by(hruid,DOY) %>%
   summarize(total_storage_today = sum(var_values)) 
-total_storage_data$DOY <- as.numeric(format(as.Date(today), "%j"))
 
 # Read in quantile data
 quantile_df <- readRDS("all_quantiles.rds")
@@ -55,7 +53,7 @@ find_quantile_group <- function(value, breaks, labels) {
 percentile_categories <- c("very low", "low", "average", "high", "very high")
 
 values_categorized <- total_storage_data %>%
-  left_join(quantile_df, by = c("hruid","DOY")) %>%
+  left_join(quantile_df_small, by = c("hruid","DOY")) %>%
   mutate(map_cat = find_quantile_group(total_storage_today, total_storage_quantiles, percentile_categories)) %>%
   select(hru_id_nat = hruid,
          value = as.character(map_cat))
