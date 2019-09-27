@@ -3,6 +3,7 @@
 library(dplyr)
 library(tidyr)
 library(pryr)
+library(data.table)
 ptm <- proc.time()
 files_to_combine <- list.files(path = "quantiles_by_hru", 
                                pattern = "total_storage_quantiles",
@@ -28,5 +29,12 @@ combined_data <- do.call("bind_cols", file_contents_list) %>%
                values_to = "total_storage_quantiles")
 print(pryr::object_size(combined_data))
 print(proc.time() - ptm)
+
+#NOTE: data.table package can modify objects in place!
+#that's why there is no explicit assignments here
+setDT(combined_data)
+combined_data[, c("0%", "10%", "25%", "75%", "90%", "100%") := transpose(total_storage_quantiles)]
+combined_data[,total_storage_quantiles := NULL]
+
 saveRDS(combined_data, "all_quantiles.rds")
 ## manually push RDS file to S3
