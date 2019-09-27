@@ -43,7 +43,7 @@ total_storage_data <- var_data_all %>%
 
 # Read in quantile data -- this df is pretty big
 quantile_df <- readRDS("all_quantiles.rds") %>% 
-  filter(DOY == yday(today))
+  filter(DOY == lubridate::yday(today))
 
 get_nonzero_duplicate_indices <- function(x) {
   zeros <- x == 0
