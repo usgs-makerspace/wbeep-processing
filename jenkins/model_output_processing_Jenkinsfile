@@ -27,7 +27,17 @@ pipeline {
         // Note that the Jenkins is on UTC!
         // May need to actually use yesterday's date depending on what time of day this runs
         //sh 'DATE=$(date -d "yesterday 13:00" "+%Y_%m_%d"); wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${DATE}.nc'
-        sh 'DATE=2019_08_22; wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${DATE}.nc'
+        sh '''
+          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/all_quantiles.rds
+          DATE=2019_08_22
+          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${DATE}.nc
+          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_dprst_stor_hru_out.nc
+          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_gwres_stor_out.nc
+          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_hru_impervstor_out.nc
+          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_hru_intcpstor_out.nc
+          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_pkwater_equiv_out.nc
+          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_soil_moist_tot_out.nc
+          '''
       }
     }
     stage('convert model output to csv for tile-join') {
@@ -41,7 +51,7 @@ pipeline {
         } 
       }
       steps {
-        sh 'DATE=2019_08_22; Rscript src/process_model_output.R ${DATE}'
+        sh 'DATE=2019-08-22; Rscript src/process_model_output.R ${DATE}'
       }
     }
     stage('push to S3') {

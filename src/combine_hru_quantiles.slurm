@@ -1,15 +1,17 @@
 #!/bin/bash
 #SBATCH --job-name=combine_quantiles     # name that you chose
-#SBATCH -c 1                   # number of cores per task
-#SBATCH -p UV              # the partition you want to use, for this case prod is best
-#SBATCH -A iidd                 # your account
+#SBATCH -c 1                            # number of cores per task
+#SBATCH -p UV,normal              # choose both partitions
+#SBATCH -A iidd                        # your account
 #SBATCH --time=12:00:00        # time at which the process will be cancelled if unfinished
-#SBATCH --mem=700G
+#SBATCH --mem=200G
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=lplatt@usgs.gov
+#SBATCH --mail-user=mhines@usgs.gov
+#SBATCH -o /logs/%A_%a-%j.log            # log file for each jobid (can insert %A_%a for each array id task if needed)
 #SBATCH --export=ALL
-#SBATCH --array=0 # don't need this to be parallel
 
-mkdir -p logs
+mkdir -p /lustre/projects/water/iidd/mhines/logs
 
-Rscript --verbose -e  'source("combine_hru_quantiles.R")' > logs/${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}.Rlog 2>&1
+module load R/3.5.1-gcc7.1.0
+
+srun Rscript /lustre/projects/water/iidd/mhines/combine_hru_quantiles_david.R
