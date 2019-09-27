@@ -70,12 +70,15 @@ calcuate_percentiles <- function(total_storage_df, hruid) {
     } else {
       seq_doy <- begin_doy:end_doy
     }
+    #TODO: make sure all 11-day windows are complete -- e.g. those at 
+    #start and end of datset won't be
     
     # Filter giant dataset to just those with the right days
     values_to_calc_df <- filter(df, DOY %in% seq_doy)
     doy_quantiles <- quantile(values_to_calc_df[[hruid]],
-                              probs = c(0, 0.10, 0.25, 0.75, 0.90, 1))
-    
+                              probs = c(0.10, 0.25, 0.75, 0.90),
+                              type = 6)
+    doy_quantiles <- c(-Inf, doy_quantiles, Inf)
     return(list(doy_quantiles))
   }
   

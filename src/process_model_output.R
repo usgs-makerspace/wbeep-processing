@@ -41,21 +41,55 @@ total_storage_data <- var_data_all %>%
   group_by(hruid,DOY) %>%
   summarize(total_storage_today = sum(var_values)) 
 
-# Read in quantile data
-quantile_df <- readRDS("all_quantiles.rds")
+# Read in quantile data -- this df is pretty big
+quantile_df <- readRDS("all_quantiles.rds") %>% 
+  filter(DOY == lubridate::yday(today))
 
-# Join quantiles to values by hruid
-# mutate a column to get category
-find_quantile_group <- function(value, breaks, labels) {
-  cut(value, unique(breaks), unique(labels)[-1], include.lowest = TRUE)
+get_nonzero_duplicate_indices <- function(x) {
+  zeros <- x == 0
+  dups <- duplicated(x, fromLast = TRUE)
+  !zeros & dups 
+}
+
+find_value_category <- function(value, labels, ...) {
+  breaks <- as.numeric(list(...))
+  #first, check if there are non-zero duplicate quantiles
+  dup_indices <- get_nonzero_duplicate_indices(breaks)
+  if(any(dup_indices)) {
+    breaks <- breaks[!dup_indices]
+    labels <- labels[-which(dup_indices)]
+  }
+  #if all zeros, mark as undefined
+  if(value == 0 && sum(breaks[2:5]) == 0) {
+    final_label <- "Undefined"
+  } else if(value == 0 && sum(breaks == 0) > 0){ 
+    #if only some are zeros and value is zero, use highest zero tier
+    high_zero_index <- max(which(breaks == 0))
+    if(high_zero_index >= 3) {
+      final_label <- labels[3]
+    } else {
+      final_label <- labels[high_zero_index]
+    } 
+  } else if(value > 0 && sum(breaks == 0) > 0) {
+    high_zero_index <- max(which(breaks == 0))
+    breaks <- breaks[high_zero_index:length(breaks)]
+    labels <- labels[high_zero_index:length(labels)]
+    final_label <- cut(value, breaks, labels, include.lowest = TRUE)
+  } else {
+    final_label <- cut(value, breaks, labels, include.lowest = TRUE)
+  }
+  final_label <- as.character(final_label)
+  return(final_label)
 }
 
 percentile_categories <- c("very low", "low", "average", "high", "very high")
 
 values_categorized <- total_storage_data %>%
   left_join(quantile_df, by = c("hruid","DOY")) %>%
-  mutate(map_cat = find_quantile_group(total_storage_today, total_storage_quantiles, percentile_categories)) %>%
-  select(hru_id_nat = hruid,
-         value = as.character(map_cat))
+  rowwise() %>% 
+  mutate(map_cat = find_value_category(value = total_storage_today, 
+                                       labels = percentile_categories, 
+                                       `0%`, `10%`, `25%`, `75%`, `90%`, `100%`)) %>%
+  rename(hru_id_nat = hruid)
 
 readr::write_csv(values_categorized, "model_output_categorized.csv")
