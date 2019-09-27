@@ -16,4 +16,4 @@ mkdir -p /lustre/projects/water/iidd/mhines/quantiles_by_hru
 
 module load R/3.5.1-gcc7.1.0
 
-srun Rscript /lustre/projects/water/iidd/mhines/process_quantiles_by_hru.slurm
+srun Rscript /lustre/projects/water/iidd/mhines/process_quantiles_by_hru.R
