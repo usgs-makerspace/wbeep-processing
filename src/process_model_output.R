@@ -87,7 +87,7 @@ percentile_categories <- c("very low", "low", "average", "high", "very high")
 values_categorized <- total_storage_data %>%
   left_join(quantile_df, by = c("hruid","DOY")) %>%
   rowwise() %>% 
-  mutate(map_cat = find_value_category(value = total_storage_today, 
+  mutate(value = find_value_category(value = total_storage_today, 
                                        labels = percentile_categories, 
                                        `0%`, `10%`, `25%`, `75%`, `90%`, `100%`)) %>%
   rename(hru_id_nat = hruid)
