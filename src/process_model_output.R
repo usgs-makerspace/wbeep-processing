@@ -7,15 +7,14 @@ today <- args[1]
 #### Code for total storage daily build
 #This section is code for what I think will replace the precip code when the percentile code is complete.
 # test for now b/c of the data we have
-today <- "2019-07-31"
-todayUnderscores <- gsub("-","_",today)
+#today <- "2019-07-31"
 
 # Combine nc files for each var
 vars <- c("soil_moist_tot", "pkwater_equiv", "hru_intcpstor",
           "hru_impervstor", "gwres_stor", "dprst_stor_hru")
 
 var_data_list <- lapply(vars, function(var) {
-  nc <- nc_open(sprintf("%s_%s.nc", todayUnderscores, var))
+  nc <- nc_open(sprintf("%s_%s.nc", today, var))
   time <- ncvar_get(nc, varid = "time")
   hruids <- ncvar_get(nc, varid = "hruid")
 
