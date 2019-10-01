@@ -34,12 +34,12 @@ pipeline {
           DATE_PRETTY="${DATE_PART//_/-}"
           wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/all_quantiles.rds
           DATE=DATE_PART
-          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_dprst_stor_hru_out.nc
-          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_gwres_stor_out.nc
-          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_hru_impervstor_out.nc
-          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_hru_intcpstor_out.nc
-          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_pkwater_equiv_out.nc
-          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_soil_moist_tot_out.nc
+          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_dprst_stor_hru.nc
+          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_gwres_stor.nc
+          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_hru_impervstor.nc
+          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_hru_intcpstor.nc
+          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_pkwater_equiv.nc
+          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_soil_moist_tot.nc
           '''
       }
     }

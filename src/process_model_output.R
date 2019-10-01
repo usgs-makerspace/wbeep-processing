@@ -15,7 +15,7 @@ vars <- c("soil_moist_tot", "pkwater_equiv", "hru_intcpstor",
           "hru_impervstor", "gwres_stor", "dprst_stor_hru")
 
 var_data_list <- lapply(vars, function(var) {
-  nc <- nc_open(sprintf("%s_%s_out.nc", todayUnderscores, var))
+  nc <- nc_open(sprintf("%s_%s.nc", todayUnderscores, var))
   time <- ncvar_get(nc, varid = "time")
   hruids <- ncvar_get(nc, varid = "hruid")
 
