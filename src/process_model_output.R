@@ -7,7 +7,7 @@ today <- args[1]
 #### Code for total storage daily build
 #This section is code for what I think will replace the precip code when the percentile code is complete.
 # test for now b/c of the data we have
-today <- "2019-07-31"
+#today <- "2019-07-31"
 todayUnderscores <- gsub("-","_",today)
 
 # Combine nc files for each var
