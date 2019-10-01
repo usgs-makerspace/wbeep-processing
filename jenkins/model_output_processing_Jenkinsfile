@@ -32,8 +32,7 @@ pipeline {
           aws s3 sync s3://owi-common-resources/resources/application/nhm/output/data/ . --exclude "*" --include "${PATTERN}"
           aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/model_output/ . --exclude "*" --include "all_quantiles.rds"
           FILES=($PATTERN)
-          DATE_PART="${FILES:0:10}"
-          DATE=DATE_PART
+          DATE="${FILES:0:10}"
           '''
       }
     }
