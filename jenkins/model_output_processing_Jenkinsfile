@@ -47,12 +47,22 @@ pipeline {
         } 
       }
       steps {
-        sh 'DATE=${DATE}; Rscript src/process_model_output.R ${DATE}'
+        sh '''
+          PATTERN="*.nc"
+          FILES=($PATTERN)
+          DATE="${FILES:0:10}"
+          DATE=${DATE}
+          '''
+          Rscript src/process_model_output.R ${DATE}'
       }
     }
     stage('push to S3') {
       steps { 
         sh ''' 
+          PATTERN="*.nc"
+          FILES=($PATTERN)
+          DATE="${FILES:0:10}"
+          DATE=${DATE}
           aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv
           echo ${DATE} > date.txt
           aws s3 cp date.txt s3://prod-owi-resources/resources/Application/wbeep/${TIER}/date.txt
