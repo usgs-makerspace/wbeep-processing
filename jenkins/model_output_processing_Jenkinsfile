@@ -28,8 +28,12 @@ pipeline {
         // May need to actually use yesterday's date depending on what time of day this runs
         //sh 'DATE=$(date -d "yesterday 13:00" "+%Y_%m_%d"); wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${DATE}.nc'
         sh '''
+          PATTERN="*.nc"
+          FILES=($PATTERN)
+          DATE_PART="${FILES:0:10}"
+          DATE_PRETTY="${DATE_PART//_/-}"
           wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/all_quantiles.rds
-          DATE=2019_08_22
+          DATE=DATE_PART
           wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${DATE}.nc
           wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_dprst_stor_hru_out.nc
           wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_gwres_stor_out.nc
@@ -37,10 +41,6 @@ pipeline {
           wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_hru_intcpstor_out.nc
           wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_pkwater_equiv_out.nc
           wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/${DATE}_soil_moist_tot_out.nc
-		  pattern="*.nc"
-		  files=($pattern)
-		  datepart="${files:0:10}"
-		  datePretty="${datepart//_/-}"
           '''
       }
     }
@@ -55,14 +55,14 @@ pipeline {
         } 
       }
       steps {
-        sh 'DATE=${datePretty}; Rscript src/process_model_output.R ${DATE}'
+        sh 'DATE=${DATE_PRETTY}; Rscript src/process_model_output.R ${DATE}'
       }
     }
     stage('push to S3') {
       steps { 
         sh ''' 
 			aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv
-			echo ${datePretty} > date.txt
+			echo ${DATE_PRETTY} > date.txt
 			aws s3 cp date.txt s3://prod-owi-resources/resources/Application/wbeep/${TIER}/date.txt
 		'''
       }
