@@ -30,7 +30,7 @@ pipeline {
         sh '''
           PATTERN="*.nc"
           aws s3 sync s3://owi-common-resources/resources/application/nhm/output/data/ . --exclude "*" --include "${PATTERN}"
-          aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/model_output/all_quantiles.rds
+          aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/model_output/ . --exclude "*" --include "all_quantiles.rds"
           FILES=($PATTERN)
           DATE_PART="${FILES:0:10}"
           DATE_PRETTY="${DATE_PART//_/-}"
