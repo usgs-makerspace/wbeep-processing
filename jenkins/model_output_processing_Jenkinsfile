@@ -61,10 +61,10 @@ pipeline {
     stage('push to S3') {
       steps { 
         sh ''' 
-			aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv
-			echo ${DATE_PRETTY} > date.txt
-			aws s3 cp date.txt s3://prod-owi-resources/resources/Application/wbeep/${TIER}/date.txt
-		'''
+          aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv
+          echo ${DATE_PRETTY} > date.txt
+          aws s3 cp date.txt s3://prod-owi-resources/resources/Application/wbeep/${TIER}/date.txt
+        '''
       }
     }
     stage('build downstream job') {
