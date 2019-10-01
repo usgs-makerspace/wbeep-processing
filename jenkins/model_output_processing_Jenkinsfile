@@ -52,8 +52,8 @@ pipeline {
           FILES=($PATTERN)
           DATE="${FILES:0:10}"
           DATE=${DATE}
-          '''
           Rscript src/process_model_output.R ${DATE}'
+          '''
       }
     }
     stage('push to S3') {
