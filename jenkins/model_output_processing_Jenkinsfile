@@ -28,7 +28,7 @@ pipeline {
         // May need to actually use yesterday's date depending on what time of day this runs
         //sh 'DATE=$(date -d "yesterday 13:00" "+%Y_%m_%d"); wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${DATE}.nc'
         sh '''
-          sh 'aws s3 sync s3://owi-common-resources/resources/application/nhm/output/data/ . --exclude "*" --include "*.nc"'
+          aws s3 sync s3://owi-common-resources/resources/application/nhm/output/data/ . --exclude "*" --include "*.nc"
           wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/all_quantiles.rds
           PATTERN="*.nc"
           FILES=($PATTERN)
