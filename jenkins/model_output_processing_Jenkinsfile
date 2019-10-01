@@ -28,18 +28,13 @@ pipeline {
         // May need to actually use yesterday's date depending on what time of day this runs
         //sh 'DATE=$(date -d "yesterday 13:00" "+%Y_%m_%d"); wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${DATE}.nc'
         sh '''
-          PATTERN="*.nc"
+          sh 'aws s3 sync s3://owi-common-resources/resources/application/nhm/output/data/ . --exclude "*" --include "*.nc"'
+		  wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/all_quantiles.rds
+		  PATTERN="*.nc"
           FILES=($PATTERN)
           DATE_PART="${FILES:0:10}"
           DATE_PRETTY="${DATE_PART//_/-}"
-          wget https://prod-owi-resources.s3-us-west-2.amazonaws.com/resources/Application/wbeep/model_output/all_quantiles.rds
           DATE=DATE_PART
-          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_dprst_stor_hru.nc
-          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_gwres_stor.nc
-          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_hru_impervstor.nc
-          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_hru_intcpstor.nc
-          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_pkwater_equiv.nc
-          wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/${DATE}_soil_moist_tot.nc
           '''
       }
     }
