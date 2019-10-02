@@ -1,7 +1,7 @@
 pipeline {
   agent {
         node {
-            label 'node:slave'
+            label 'team:makerspace'
         }
     }
   parameters {
@@ -32,8 +32,7 @@ pipeline {
           aws s3 sync s3://owi-common-resources/resources/application/nhm/output/data/ . --exclude "*" --include "${PATTERN}"
           aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/model_output/ . --exclude "*" --include "all_quantiles.rds"
           FILES=($PATTERN)
-          DATE_PART="${FILES:0:10}"
-          DATE=DATE_PART
+          DATE="${FILES:0:10}"
           '''
       }
     }
@@ -48,12 +47,20 @@ pipeline {
         } 
       }
       steps {
-        sh 'DATE=${DATE}; Rscript src/process_model_output.R ${DATE}'
+        sh '''
+          PATTERN="*.nc"
+          FILES=($PATTERN)
+          DATE="${FILES:0:10}"
+          Rscript src/process_model_output.R "${DATE}"
+          '''
       }
     }
     stage('push to S3') {
       steps { 
         sh ''' 
+          PATTERN="*.nc"
+          FILES=($PATTERN)
+          DATE="${FILES:0:10}"
           aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv
           echo ${DATE} > date.txt
           aws s3 cp date.txt s3://prod-owi-resources/resources/Application/wbeep/${TIER}/date.txt
