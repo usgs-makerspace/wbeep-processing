@@ -11,6 +11,11 @@ pipeline {
         choice(choices: ['test', 'qa', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
   }
   stages {
+  	stage('Clean Workspace') {
+	  steps{
+		cleanWs()
+	  }
+	}
     stage('Checkout repo and pull model output from S3') {
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
