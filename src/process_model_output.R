@@ -50,7 +50,7 @@ get_nonzero_duplicate_indices <- function(x) {
   !zeros & dups 
 }
 
-find_value_category <- function(value, labels, hruid, ...) {
+find_value_category <- function(value, labels, ...) {
   breaks <- as.numeric(list(...))
   #first, check if there are non-zero duplicate quantiles
   dup_indices <- get_nonzero_duplicate_indices(breaks)
@@ -88,10 +88,7 @@ values_categorized <- total_storage_data %>%
   rowwise() %>% 
   mutate(value = find_value_category(value = total_storage_today, 
                                      labels = percentile_categories,
-                                     hruid=hruid,
                                      `0%`, `10%`, `25%`, `75%`, `90%`, `100%`)) %>%
   rename(hru_id_nat = hruid)
-
-temp <- quantile_df %>% filter(quantile_df)
 
 readr::write_csv(values_categorized, "model_output_categorized.csv")
