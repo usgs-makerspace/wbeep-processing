@@ -50,7 +50,7 @@ get_nonzero_duplicate_indices <- function(x) {
   !zeros & dups 
 }
 
-find_value_category <- function(value, labels, ...) {
+find_value_category <- function(value, labels, hruid, ...) {
   breaks <- as.numeric(list(...))
   #first, check if there are non-zero duplicate quantiles
   dup_indices <- get_nonzero_duplicate_indices(breaks)
@@ -59,7 +59,7 @@ find_value_category <- function(value, labels, ...) {
     labels <- labels[-which(dup_indices)]
   }
   #if all zeros, mark as undefined
-  if(value == 0 && sum(breaks[2:5]) == 0) {
+  if(value == 0 && sum(breaks[2:5],na.rm = TRUE) == 0) {
     final_label <- "Undefined"
   } else if(value == 0 && sum(breaks == 0) > 0){ 
     #if only some are zeros and value is zero, use highest zero tier
@@ -87,8 +87,11 @@ values_categorized <- total_storage_data %>%
   left_join(quantile_df, by = c("hruid","DOY")) %>%
   rowwise() %>% 
   mutate(value = find_value_category(value = total_storage_today, 
-                                       labels = percentile_categories, 
-                                       `0%`, `10%`, `25%`, `75%`, `90%`, `100%`)) %>%
+                                     labels = percentile_categories,
+                                     hruid=hruid,
+                                     `0%`, `10%`, `25%`, `75%`, `90%`, `100%`)) %>%
   rename(hru_id_nat = hruid)
+
+temp <- quantile_df %>% filter(quantile_df)
 
 readr::write_csv(values_categorized, "model_output_categorized.csv")
