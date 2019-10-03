@@ -58,7 +58,7 @@ find_value_category <- function(value, labels, ...) {
     breaks <- breaks[!dup_indices]
     labels <- labels[-which(dup_indices)]
   }
-  #if all zeros, mark as undefined
+  #if all zeros, mark as undefined, need check for NA in case >2 quantiles are the same
   if(value == 0 && sum(breaks[2:5], na.rm = TRUE) == 0) {
     final_label <- "Undefined"
   } else if(value == 0 && sum(breaks == 0) > 0){ 
