@@ -59,7 +59,7 @@ find_value_category <- function(value, labels, ...) {
     labels <- labels[-which(dup_indices)]
   }
   #if all zeros, mark as undefined
-  if(value == 0 && sum(breaks[2:5],na.rm = TRUE) == 0) {
+  if(value == 0 && sum(breaks[2:5], na.rm = TRUE) == 0) {
     final_label <- "Undefined"
   } else if(value == 0 && sum(breaks == 0) > 0){ 
     #if only some are zeros and value is zero, use highest zero tier
