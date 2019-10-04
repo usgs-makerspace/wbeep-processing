@@ -10,7 +10,7 @@ today <- args[1]
 #today <- "2019-07-31"
 
 # Combine nc files for each var
-vars <- c("soil_moist_tot", "hru_intcpstor",
+vars <- c("soil_moist_tot", "hru_intcpstor", "pkwater_equiv",
           "hru_impervstor", "gwres_stor", "dprst_stor_hru")
 
 var_data_list <- lapply(vars, function(var) {

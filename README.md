@@ -41,3 +41,32 @@ Ideally, rather than working in your home dir, email Natalya Rapstine (nrapstine
 1. When that is complete, you can kick off the final process which will combine all of HRU files into one quantiles file called `all_quantiles-[date].rds`. To start, execute `sbatch combine_hru_quantiles.slurm`.
 
 That should be everything! The resulting quantiles RDS file will need to be manually uploaded to the appropriate S3 bucket. You can now delete the files on your Yeti root directory (and you should to free up space).
+
+## Subsetting the historical NetCDF files to a single day
+
+We are doing this to be able to troubleshoot the viz while the model is still running. I wanted to document how I did it in case we need to do it again in the future (or when we want to see what a different date looks like). The resulting files can be used as input to the `process_model_output.R` step.
+
+1. Make sure you have the historic files. They are in the form `historical_[var]_out.nc`.
+1. Login to Yeti, `ssh user@yeti.cr.usgs.gov`
+1. Start a new interactive session using, ``
+1. Load the module to subset and save NetCDF files with `module load tools/nco-4.7.8-gnu`.
+1. Identify which day you would like to use. For this example, I am using `1992-12-06`.
+1. Figure out the appropriate NetCDF time index based on your chosen date: Start an R session by typing `R` and hitting enter. Then run the following code (it shouldn't matter which NetCDF file you use to figure this out). Take the resulting number and use it in to the `ncks` command in the next step. For `1992-12-06`, this value was `4449`. End the R session by running `q()`.
+
+    ```
+    nc <- nc_open("historical_soil_moist_tot_out.nc")
+    time_att <- ncdf4::ncatt_get(nc, "time")
+    time_start <- as.Date(gsub("days since ", "", time_att$units))
+    as.numeric(day - time_start)
+    ```
+
+1. Create the subsets by running the code below with your chosen day and the corresponding NetCDF index substituted where appropriate. For this example, the day is `1992-12-06` and the corresponding NetCDF time index is `4449`.
+
+    ```
+    for f in historical*; do
+        out_f=1992-12-06_$f
+        ncks -d time,4449 $f $out_f
+    done
+    ```
+
+You should now have a set of subset NetCDF files named with the appropriate date in your environment.
