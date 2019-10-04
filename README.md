@@ -48,7 +48,7 @@ We are doing this to be able to troubleshoot the viz while the model is still ru
 
 1. Make sure you have the historic files. They are in the form `historical_[var]_out.nc`.
 1. Login to Yeti, `ssh user@yeti.cr.usgs.gov`
-1. Start a new interactive session using, ``
+1. Start a new interactive session using, `sinteractive -A iidd -p normal -n 1 -t 00:30:00`
 1. Load the module to subset and save NetCDF files with `module load tools/nco-4.7.8-gnu`.
 1. Identify which day you would like to use. For this example, I am using `1992-12-06`.
 1. Figure out the appropriate NetCDF time index based on your chosen date: Start an R session by typing `R` and hitting enter. Then run the following code (it shouldn't matter which NetCDF file you use to figure this out). Take the resulting number and use it in to the `ncks` command in the next step. For `1992-12-06`, this value was `4449`. End the R session by running `q()`.
