@@ -50,22 +50,25 @@ We are doing this to be able to troubleshoot the viz while the model is still ru
 1. Login to Yeti, `ssh user@yeti.cr.usgs.gov`
 1. Start a new interactive session using, `sinteractive -A iidd -p normal -n 1 -t 00:30:00`
 1. Load the module to subset and save NetCDF files with `module load tools/nco-4.7.8-gnu`.
-1. Identify which day you would like to use. For this example, I am using `1992-12-06`.
-1. Figure out the appropriate NetCDF time index based on your chosen date: Start an R session by typing `R` and hitting enter. Then run the following code (it shouldn't matter which NetCDF file you use to figure this out). Take the resulting number and use it in to the `ncks` command in the next step. For `1992-12-06`, this value was `4449`. End the R session by running `q()`.
+1. Identify which day you would like to use. For this example, I am using `2018-05-06`.
+1. Figure out the appropriate NetCDF time index based on your chosen date: Start an R session by typing `R` and hitting enter. Then run the following code (it shouldn't matter which NetCDF file you use to figure this out). Take the resulting number and use it in to the `ncks` command in the next step. For `2018-05-06`, this value was `13731`. End the R session by running `q()`.
 
     ```
+    library(ncdf4)
     nc <- nc_open("historical_soil_moist_tot_out.nc")
     time_att <- ncdf4::ncatt_get(nc, "time")
     time_start <- as.Date(gsub("days since ", "", time_att$units))
-    as.numeric(day - time_start)
+    as.numeric(as.Date("2018-05-06") - time_start)
     ```
 
-1. Create the subsets by running the code below with your chosen day and the corresponding NetCDF index substituted where appropriate. For this example, the day is `1992-12-06` and the corresponding NetCDF time index is `4449`.
+1. Create the subsets by running the code below with your chosen day and the corresponding NetCDF index substituted where appropriate. For this example, the day is `2018-05-06` and the corresponding NetCDF time index is `4449`.
 
     ```
-    for f in historical*; do
-        out_f=1992-12-06_$f
-        ncks -d time,4449 $f $out_f
+    vars='dprst_stor_hru soil_moist_tot hru_intcpstor pkwater_equiv hru_impervstor gwres_stor'
+    for v in $vars; do
+        f='historical_'$v'_out.nc'
+        out_f='2018-05-06_'$v'.nc'
+        ncks -d time,13731 $f $out_f
     done
     ```
 
