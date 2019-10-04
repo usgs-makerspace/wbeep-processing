@@ -7,15 +7,14 @@ today <- args[1]
 #### Code for total storage daily build
 #This section is code for what I think will replace the precip code when the percentile code is complete.
 # test for now b/c of the data we have
-today <- "2019-07-31"
-todayUnderscores <- gsub("-","_",today)
+#today <- "2019-07-31"
 
 # Combine nc files for each var
-vars <- c("soil_moist_tot", "pkwater_equiv", "hru_intcpstor",
+vars <- c("soil_moist_tot", "hru_intcpstor",
           "hru_impervstor", "gwres_stor", "dprst_stor_hru")
 
 var_data_list <- lapply(vars, function(var) {
-  nc <- nc_open(sprintf("%s_%s_out.nc", todayUnderscores, var))
+  nc <- nc_open(sprintf("%s_%s.nc", today, var))
   time <- ncvar_get(nc, varid = "time")
   hruids <- ncvar_get(nc, varid = "hruid")
 
@@ -59,8 +58,8 @@ find_value_category <- function(value, labels, ...) {
     breaks <- breaks[!dup_indices]
     labels <- labels[-which(dup_indices)]
   }
-  #if all zeros, mark as undefined
-  if(value == 0 && sum(breaks[2:5]) == 0) {
+  #if all zeros, mark as undefined, need check for NA in case >2 quantiles are the same
+  if(value == 0 && sum(breaks[2:5], na.rm = TRUE) == 0) {
     final_label <- "Undefined"
   } else if(value == 0 && sum(breaks == 0) > 0){ 
     #if only some are zeros and value is zero, use highest zero tier
@@ -87,9 +86,9 @@ percentile_categories <- c("very low", "low", "average", "high", "very high")
 values_categorized <- total_storage_data %>%
   left_join(quantile_df, by = c("hruid","DOY")) %>%
   rowwise() %>% 
-  mutate(map_cat = find_value_category(value = total_storage_today, 
-                                       labels = percentile_categories, 
-                                       `0%`, `10%`, `25%`, `75%`, `90%`, `100%`)) %>%
+  mutate(value = find_value_category(value = total_storage_today, 
+                                     labels = percentile_categories,
+                                     `0%`, `10%`, `25%`, `75%`, `90%`, `100%`)) %>%
   rename(hru_id_nat = hruid)
 
 readr::write_csv(values_categorized, "model_output_categorized.csv")
