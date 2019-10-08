@@ -82,4 +82,26 @@ pipeline {
       }
     }
   }
+    post {
+        success {
+            mail to: 'mhines@usgs.gov',
+            subject: "Success: ${currentBuild.fullDisplayName}",
+            body: "Pipeline finished successfully ${env.BUILD_URL}"
+        }
+        unstable {
+            mail to: 'mhines@usgs.gov',
+            subject: "Unstable: ${currentBuild.fullDisplayName}",
+            body: "Pipeline is unstable ${env.BUILD_URL}"
+        }
+        failure {
+            mail to: 'mhines@usgs.gov',
+            subject: "Failure: ${currentBuild.fullDisplayName}",
+            body: "Pipeline failed ${env.BUILD_URL}"
+        }
+        changed {
+            mail to: 'mhines@usgs.gov',
+            subject: "Changes: ${currentBuild.fullDisplayName}",
+            body: "Pipeline detected changes ${env.BUILD_URL}"
+        }
+    }  
 }
