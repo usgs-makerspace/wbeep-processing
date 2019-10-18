@@ -35,9 +35,7 @@ pipeline {
         } 
       }
       steps {
-        sh '''
-          tippecanoe -output-to-directory basemap -Z2 -z10 counties.geojson neighboringcountry.json states.geojson
-          '''
+        sh 'tippecanoe -output-to-directory basemap -Z2 -z10 counties.geojson neighboringcountry.json states.geojson'
       }
     }
     stage('push to S3') {
