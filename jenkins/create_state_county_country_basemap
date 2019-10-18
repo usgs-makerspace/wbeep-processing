@@ -35,7 +35,8 @@ pipeline {
         } 
       }
       steps {
-        sh 'tippecanoe -output-to-directory basemap -Z2 -z10 counties.geojson neighboringcountry.json states.geojson'
+        sh "mkdir ${WORKSPACE}/basemap"
+        sh 'tippecanoe -Z2 -z10 --force -output-to-directory basemap counties.geojson neighboringcountry.json states.geojson'
       }
     }
     stage('push to S3') {
