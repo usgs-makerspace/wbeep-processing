@@ -1,7 +1,7 @@
 pipeline {
   agent {
         node {
-            label 'team:makerspace'
+            label 'node:slave'
         }
     }
   parameters {
@@ -42,7 +42,7 @@ pipeline {
       }
       steps {
         sh "mkdir ${WORKSPACE}/basemap"
-        sh 'tippecanoe -Z2 -z10 --force -output-to-directory basemap counties.geojson neighboringcountry.json states.geojson'
+        sh 'tippecanoe -Z2 -z10 --force --output-to-directory basemap counties.geojson neighboringcountry.json states.geojson'
       }
     }
     stage('push to S3') {
