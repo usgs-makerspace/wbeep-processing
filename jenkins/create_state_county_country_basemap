@@ -4,6 +4,12 @@ pipeline {
             label 'team:makerspace'
         }
     }
+  parameters {
+        gitParameter name: 'BRANCH_TAG',
+                     type: 'PT_BRANCH_TAG',
+                     defaultValue: 'master'
+        choice(choices: ['test', 'qa', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+  }
   stages {
     stage('Clean Workspace') {
 	    steps{
