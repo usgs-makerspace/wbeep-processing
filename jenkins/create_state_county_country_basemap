@@ -36,7 +36,7 @@ pipeline {
       }
       steps {
         sh '''
-          tippecanoe -output-to-directory basemap -f -Z 2 -z 10 counties.json neighboringcountry.json states.json
+          tippecanoe -output-to-directory basemap -f -Z 2 -z 10 counties.geojson neighboringcountry.json states.geojson
           '''
       }
     }
