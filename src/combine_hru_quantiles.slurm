@@ -14,4 +14,4 @@ mkdir -p /lustre/projects/water/iidd/mhines/logs
 
 module load R/3.5.1-gcc7.1.0
 
-srun Rscript /lustre/projects/water/iidd/mhines/combine_hru_quantiles_david.R
+srun Rscript /lustre/projects/water/iidd/mhines/combine_hru_quantiles.R
