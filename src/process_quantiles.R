@@ -148,7 +148,6 @@ if(!file.exists(quantile_fn)) {
   all_hru_quantiles_list <- lapply(hru_seq, function(hruid_i) {
     
     hru_data <- dt_wide[hruid == hruid_i,]
-    hru_data[, hruid := NULL]
     
     doy_quantile_list <- lapply(1:365, function(target_doy, dt) {
       target_doy_seq <- get_doy_sequence(target_doy)
