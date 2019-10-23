@@ -63,10 +63,10 @@ read_ncdf_data <- function(fn, varid, hru_seq) {
   # data_years_complete <- names(n_days_per_year)[n_days_per_year >= 365]
   
   year_doy_vector <- format(time_fixed, "%Y_%j")
-  dt <- as.data.table(cbind(hruid, data_nc)) # takes ~2 minutes
-  names(dt) <- c("hruid", year_doy_vector)
+  dt <- as.data.table(data_nc)
+  dt[, hruid := hru_seq]
+  names(dt) <- c(year_doy_vector, "hruid")
   dt_long <- melt(dt, id.vars = "hruid", variable.name = "year_doy")
-  dt_long[, variable := varid]
   
   return(dt_long)
 }
@@ -140,14 +140,9 @@ if(!file.exists(quantile_fn)) {
     dt_long <- rbind(dt_long, var_df)
   }
   
-  #######################
-  # Find data.table equivalent to "separate"
-  # dt_long_sep <- tidyr::separate(dt_long, year_doy, c("year", "doy"), "_")
-  # Doesn't seem that much faster ...
+  # Split year_doy into separate columns
+  # Converting to numeric (type_convert = TRUE) slows down
   dt_long[, c("year", "doy") := tstrsplit(year_doy, "_", fixed=TRUE)]
-  dt_long[, year_doy := NULL]
-  
-  #######################
   
   # `fill = NA` to account for missing dates at beginning 
   #   of 1980 and end of 2019
