@@ -15,7 +15,7 @@
 #                 hru_impervstor + gwres_stor + dprst_stor_hru
 
 # TO DO: 
-#   1. Use task_id to loop through groups of HRUs using slurm
+#   1. Use task_id to loop through groups of HRUs using slurm - haven't been able to get a test working
 #   2. Calc for probs = seq(0, 1, by = 0.05)
 #   3. Fix this to work with incomplete years & leap years
 #   4. Add -Inf and +Inf in `combine_hru_quantiles` right before saving.
@@ -115,17 +115,18 @@ if(!file.exists(quantile_fn)) {
     
     hru_data <- dt_wide[hruid == hruid_i,]
     
+    ############# WORKING ON THIS
+    # Still need to figure out best solution for leap years
+    #############
+    
     all_doy_seq <- 1:365
-    doy_quantile_list <- lapply(doy_seq, function(target_doy, dt) {
+    doy_quantile_list <- lapply(all_doy_seq, function(target_doy, dt) {
       
       # Get doy sequence
       # Create doy vector that may extend into negative or beyond 365
       # If below 1 or beyond 365, wrap around so all numbers are between 1 and 365
       target_doy_seq_literal <- (-5:5) + target_doy # 5 = window to use around date
-      target_doy_seq <- ((target_doy_seq - 1) %% 365) + 1 
-      ############# WORKING ON THIS
-      # Still need to figure out best solution for leap years
-      #############
+      target_doy_seq <- ((target_doy_seq_literal - 1) %% 365) + 1 
       
       # Extract doy cols into a vector
       doy_seq_colnames <- sprintf("%03d", target_doy_seq)
@@ -159,5 +160,5 @@ if(!file.exists(quantile_fn)) {
          sprintf("grouped_quantiles/time_passed_%s_%s.txt", hru_start, hru_end)) 
   # finished in 5 min for 1:1000
 } else {
-  message(sprintf("Quantiles already complete for HRUs %s to %. Delete or rename the file to override and re-calculate.", hru_start, hru_end))
+  message(sprintf("Quantiles already complete for HRUs %s to %s. Delete or rename the file to override and re-calculate.", hru_start, hru_end))
 }
