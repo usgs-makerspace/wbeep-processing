@@ -145,9 +145,9 @@ if(!file.exists(quantile_fn)) {
     doy_quantile_list <- lapply(1:365, function(target_doy, dt) {
       target_doy_seq <- get_doy_sequence(target_doy)
       target_doy_values <- extract_doy_cols_to_vec(dt, target_doy_seq)
-      target_doy_quantile_mat <- get_quantile_mat(target_doy_values, target_doy_seq, target_doy)
+      target_doy_quantile_mat <- get_quantile_mat(target_doy_values, target_doy)
       return(target_doy_quantile_mat)
-    }, df = hru_data)
+    }, dt = hru_data)
     
     hru_quantiles_mat <- do.call("rbind", doy_quantile_list)
     hru_quantiles_mat <- cbind(hruid = hruid_i, hru_quantiles_mat)
