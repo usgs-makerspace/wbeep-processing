@@ -5,7 +5,7 @@
 library(sf)
 library(dplyr)
 #this came from NHDplustools
-#probably need to work on Yeti, full unzipped gdp of NHDPlus is 80GB
+#probably need to work on Yeti, full unzipped .gdb of NHDPlus is 80GB
 geom <- readRDS('geom_relevant.rds') 
 
 for(order in unique(geom$StreamOrde)) {
@@ -16,7 +16,7 @@ for(order in unique(geom$StreamOrde)) {
   message(order, "done")
 }
 
-
+############################
 #combine a few individual files to make inputs for grouped tileset
 two <- st_read('nhd_geojson/nhdplus_order_2.geojson')
 three <- st_read('nhd_geojson/nhdplus_order_3.geojson')
