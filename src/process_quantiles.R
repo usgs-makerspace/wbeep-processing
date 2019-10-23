@@ -72,23 +72,16 @@ read_ncdf_data <- function(fn, varid, hru_seq) {
 }
 get_doy_sequence <- function(target_doy, window = 5) {
   
-  # Determine which doy to start & end with in the window
-  begin_doy <- target_doy - window
-  end_doy <- target_doy + window
+  # Create doy vector that may extend into negative or beyond 365
+  seq_doy <- (-window:window) + target_doy 
   
-  # Handle edge cases:
-  last_doy <- 365 # switch back to 366 once leap days are implemented
-  if(begin_doy <= 0) {
-    # Need to look backward into last days of the year
-    seq_doy <- c((last_doy + begin_doy):last_doy, 1:end_doy)
-  } else if (end_doy > last_doy) {
-    # Need to look forward into first days of the year
-    seq_doy <- c(begin_doy:last_doy, 1:(end_doy - last_doy))
-  } else {
-    seq_doy <- begin_doy:end_doy
-  }
+  # If below 1 or beyond 365, wrap around so all numbers are between 1 and 365
+  seq_doy_real <- ((seq_doy - 1) %% 365) + 1 
   
-  return(seq_doy)
+  ############# WORKING ON THIS
+  # Still need to figure out best solution for leap years
+  #############
+  return(seq_doy_real)
 }
 extract_doy_cols_to_vec <- function(dt, doy_seq) {
   doy_seq_colnames <- sprintf("%03d", doy_seq)
