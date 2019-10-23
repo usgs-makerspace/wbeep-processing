@@ -62,7 +62,7 @@ read_ncdf_data <- function(fn, varid, hru_seq) {
   # n_days_per_year <- table(data_years)
   # data_years_complete <- names(n_days_per_year)[n_days_per_year >= 365]
   
-  year_doy_vector <- paste(format(time_fixed, "%Y"), format(time_fixed, "%j"), sep = "_")
+  year_doy_vector <- format(time_fixed, "%Y_%j")
   dt <- as.data.table(cbind(hruid, data_nc)) # takes ~2 minutes
   names(dt) <- c("hruid", year_doy_vector)
   dt_long <- melt(dt, id.vars = "hruid", variable.name = "year_doy")
