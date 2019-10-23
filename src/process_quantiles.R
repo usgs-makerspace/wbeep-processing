@@ -90,14 +90,10 @@ get_doy_sequence <- function(target_doy, window = 5) {
   
   return(seq_doy)
 }
-extract_doy_cols_to_vec <- function(df, doy_seq) {
-  ############## WORKING ON THIS
-  # Do I need to convert to df?
-  df <- as.data.frame(df)
+extract_doy_cols_to_vec <- function(dt, doy_seq) {
   doy_seq_colnames <- sprintf("%03d", doy_seq)
-  target_df <- df[, doy_seq_colnames]
-  ############## 
-  target_vector <- unlist(target_df, use.names = FALSE)
+  target_dt <- dt[, doy_seq_colnames, with=FALSE]
+  target_vector <- unlist(target_dt, use.names = FALSE)
   return(target_vector)
 }
 get_quantile_mat <- function(target_doy_values, target_doy, probs = c(0.10, 0.25, 0.75, 0.90)) {
@@ -154,9 +150,9 @@ if(!file.exists(quantile_fn)) {
     hru_data <- dt_wide[hruid == hruid_i,]
     hru_data[, hruid := NULL]
     
-    doy_quantile_list <- lapply(1:365, function(target_doy, df) {
+    doy_quantile_list <- lapply(1:365, function(target_doy, dt) {
       target_doy_seq <- get_doy_sequence(target_doy)
-      target_doy_values <- extract_doy_cols_to_vec(df, target_doy_seq)
+      target_doy_values <- extract_doy_cols_to_vec(dt, target_doy_seq)
       target_doy_quantile_mat <- get_quantile_mat(target_doy_values, target_doy_seq, target_doy)
       return(target_doy_quantile_mat)
     }, df = hru_data)
