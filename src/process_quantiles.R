@@ -1,0 +1,164 @@
+# Processing code to create percentiles for groups of HRUs
+
+# This is preliminary work.
+
+# Creating a historic understanding of how "total storage"
+#   has varied through time for each HRU by calculating
+#   quantiles to establish very low, low, normal, high, 
+#   and very high thresholds of "total storage" for each
+#   HRU at every day of the year. Rather than only using
+#   values at every day of the year, we are using 5 values
+#   before and 5 values after to calculate the thresholds 
+#   for each day.
+
+# Total storage = pkwater_equiv + soil_moist_tot + hru_intcpstor +
+#                 hru_impervstor + gwres_stor + dprst_stor_hru
+
+# TO DO: 
+#   1. Use task_id to loop through groups of HRUs using slurm - haven't been able to get a test working
+#   2. Calc for probs = seq(0, 1, by = 0.05)
+#   3. Fix this to work with incomplete years & leap years
+#   4. Add -Inf and +Inf in `combine_hru_quantiles` right before saving.
+
+start <- Sys.time()
+library(ncdf4) 
+library(data.table)
+
+########## Functions ########## 
+task_id_to_hru_seq <- function(task_id, n_hrus_per_task = 1000) {
+  # Convert task id to HRU ids (increment by n_hrus_per_task)
+  hru_id_start <- ((task_id-1)*n_hrus_per_task + 1) # which hru to start with
+  hru_id_end <- hru_id_start + (n_hrus_per_task-1) # which hru to end with
+  
+  # If we are past the last column, cut the final col id off
+  n_hrus <- 109951
+  hru_id_end <- ifelse(hru_id_end > n_hrus,
+                       yes = n_hrus,
+                       no = hru_id_end)
+  
+  hru_seq <- hru_id_start:hru_id_end
+  return(hru_seq)
+}
+read_ncdf_data <- function(fn, varid, hru_seq) {
+  
+  # The file is NetCDF
+  nc <- nc_open(fn)
+  
+  message(sprintf("Reading in NetCDF data for %s", varid))
+  # Only load rows for current HRUs
+  data_nc <- ncvar_get(nc, varid, 
+                       start = c(head(hru_seq, 1), 1),
+                       count = c(length(hru_seq), -1))
+  time <- ncvar_get(nc, "time")
+  hruid <- ncvar_get(nc, "hruid")[hru_seq]
+  
+  # Convert ncdf4 times to R dates
+  time_att <- ncdf4::ncatt_get(nc, "time")
+  time_start <- as.Date(gsub("days since ", "", time_att$units))
+  time_fixed <- time + time_start # creates dates from the "days since" var
+  
+  # Keep only complete years of data
+  # data_years <- format(time_fixed, "%Y")
+  # n_days_per_year <- table(data_years)
+  # data_years_complete <- names(n_days_per_year)[n_days_per_year >= 365]
+  
+  year_doy_vector <- format(time_fixed, "%Y_%j")
+  dt <- as.data.table(data_nc)
+  dt[, hruid := hru_seq]
+  names(dt) <- c(year_doy_vector, "hruid")
+  dt_long <- melt(dt, id.vars = "hruid", variable.name = "year_doy")
+  
+  return(dt_long)
+}
+########## ////// ########## 
+
+# Identify task id from yeti environment & convert to HRU ids ----
+# task_id <- as.numeric(Sys.getenv('SLURM_ARRAY_TASK_ID', 'NA'))
+task_id <- 2 # Will uncomment once setup with slurm
+hru_seq <- task_id_to_hru_seq(task_id)
+hru_start <- head(hru_seq, 1)
+hru_end <- tail(hru_seq, 1)
+quantile_fn <- sprintf("grouped_quantiles/total_storage_quantiles_%s_to_%s.csv", hru_start, hru_end)
+
+if(!file.exists(quantile_fn)) {
+
+  message(sprintf("Started this task at %s", Sys.time()))
+
+  vars <- c(
+    "soil_moist_tot",
+    "pkwater_equiv",
+    "hru_intcpstor", 
+    "hru_impervstor",
+    "gwres_stor", 
+    "dprst_stor_hru"
+  )
+  
+  dt_long <- c()
+  for(var in vars) {
+    # Read in the two datasets
+    ncdf_fn <- sprintf("historical_%s_out.nc", var)
+    var_df <- read_ncdf_data(ncdf_fn, var, hru_seq)
+    dt_long <- rbind(dt_long, var_df)
+  }
+  
+  # Split year_doy into separate columns
+  # Converting to numeric (type_convert = TRUE) slows down
+  dt_long[, c("year", "doy") := tstrsplit(year_doy, "_", fixed=TRUE)]
+  
+  # `fill = NA` to account for missing dates at beginning 
+  #   of 1980 and end of 2019
+  # This spreads + sums the values! Takes ~ 10 sec
+  dt_wide <- dcast(dt_long, hruid+year ~ doy, fun=sum, fill=NA)
+  dt_wide[, year := NULL]
+  
+  all_hru_quantiles_list <- lapply(hru_seq, function(hruid_i) {
+    
+    hru_data <- dt_wide[hruid == hruid_i,]
+    
+    ############# WORKING ON THIS
+    # Still need to figure out best solution for leap years
+    #############
+    
+    all_doy_seq <- 1:365
+    doy_quantile_list <- lapply(all_doy_seq, function(target_doy, dt) {
+      
+      # Get doy sequence
+      # Create doy vector that may extend into negative or beyond 365
+      # If below 1 or beyond 365, wrap around so all numbers are between 1 and 365
+      target_doy_seq_literal <- (-5:5) + target_doy # 5 = window to use around date
+      target_doy_seq <- ((target_doy_seq_literal - 1) %% 365) + 1 
+      
+      # Extract doy cols into a vector
+      doy_seq_colnames <- sprintf("%03d", target_doy_seq)
+      target_dt <- dt[, doy_seq_colnames, with=FALSE]
+      target_doy_values <- unlist(target_dt, use.names = FALSE)
+      
+      # Calculate quantiles
+      target_doy_quantiles <- quantile(target_doy_values, 
+                                       probs = c(0.10, 0.25, 0.75, 0.90), 
+                                       type = 6, na.rm = TRUE)
+      
+      return(target_doy_quantiles)
+    }, dt = hru_data)
+    
+    hru_quantiles_mat <- do.call("rbind", doy_quantile_list)
+    hru_quantiles_mat <- cbind(hruid = hruid_i, DOY = all_doy_seq, hru_quantiles_mat)
+    
+    return(hru_quantiles_mat)
+  })
+  
+  all_hru_quantiles_df <- do.call("rbind", all_hru_quantiles_list)
+  
+  fwrite(all_hru_quantiles_df, quantile_fn)
+  
+  # Timekeeping to see how long it takes
+  end <- Sys.time()
+  time_passed <- end - start
+  fwrite(list(start = as.character(start), 
+              end = as.character(end), 
+              time_passed = time_passed), 
+         sprintf("grouped_quantiles/time_passed_%s_%s.txt", hru_start, hru_end)) 
+  # finished in 5 min for 1:1000
+} else {
+  message(sprintf("Quantiles already complete for HRUs %s to %s. Delete or rename the file to override and re-calculate.", hru_start, hru_end))
+}
