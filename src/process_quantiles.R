@@ -100,14 +100,13 @@ extract_doy_cols_to_vec <- function(df, doy_seq) {
   target_vector <- unlist(target_df, use.names = FALSE)
   return(target_vector)
 }
-get_quantile_df <- function(target_doy_values, target_doy_seq, 
-                            target_doy, probs = c(0.10, 0.25, 0.75, 0.90)) {
+get_quantile_mat <- function(target_doy_values, target_doy, probs = c(0.10, 0.25, 0.75, 0.90)) {
   target_doy_quantiles <- quantile(target_doy_values, 
                                    probs = probs, 
                                    type = 6,
                                    na.rm = TRUE)
-  target_doy_quantile_df <- cbind(DOY = target_doy, t(target_doy_quantiles))
-  return(target_doy_quantile_df)
+  target_doy_quantile_mat <- cbind(DOY = target_doy, t(target_doy_quantiles))
+  return(target_doy_quantile_mat)
 }
 ########## ////// ########## 
 
@@ -158,14 +157,14 @@ if(!file.exists(quantile_fn)) {
     doy_quantile_list <- lapply(1:365, function(target_doy, df) {
       target_doy_seq <- get_doy_sequence(target_doy)
       target_doy_values <- extract_doy_cols_to_vec(df, target_doy_seq)
-      target_doy_quantile_df <- get_quantile_df(target_doy_values, target_doy_seq, target_doy)
-      return(target_doy_quantile_df)
+      target_doy_quantile_mat <- get_quantile_mat(target_doy_values, target_doy_seq, target_doy)
+      return(target_doy_quantile_mat)
     }, df = hru_data)
     
-    hru_quantiles_df <- do.call("rbind", doy_quantile_list)
-    hru_quantiles_df <- cbind(hruid = hruid_i, hru_quantiles_df)
+    hru_quantiles_mat <- do.call("rbind", doy_quantile_list)
+    hru_quantiles_mat <- cbind(hruid = hruid_i, hru_quantiles_mat)
     
-    return(hru_quantiles_df)
+    return(hru_quantiles_mat)
   })
   
   all_hru_quantiles_df <- do.call("rbind", all_hru_quantiles_list)
