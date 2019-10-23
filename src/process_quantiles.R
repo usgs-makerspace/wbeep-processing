@@ -115,70 +115,76 @@ get_quantile_df <- function(target_doy_values, target_doy_seq,
 # task_id <- as.numeric(Sys.getenv('SLURM_ARRAY_TASK_ID', 'NA'))
 task_id <- 2 # Will uncomment once setup with slurm
 hru_seq <- task_id_to_hru_seq(task_id)
+hru_start <- head(hru_seq, 1)
+hru_end <- tail(hru_seq, 1)
+quantile_fn <- sprintf("grouped_quantiles/total_storage_quantiles_%s_to_%s.csv", hru_start, hru_end)
 
-message(sprintf("Started this task at %s", Sys.time()))
+if(!file.exists(quantile_fn)) {
 
-vars <- c(
-  "soil_moist_tot",
-  "pkwater_equiv",
-  "hru_intcpstor", 
-  "hru_impervstor",
-  "gwres_stor", 
-  "dprst_stor_hru"
-)
+  message(sprintf("Started this task at %s", Sys.time()))
 
-dt_long <- c()
-for(var in vars) {
+  vars <- c(
+    "soil_moist_tot",
+    "pkwater_equiv",
+    "hru_intcpstor", 
+    "hru_impervstor",
+    "gwres_stor", 
+    "dprst_stor_hru"
+  )
   
-  # Read in the two datasets
-  ncdf_fn <- sprintf("historical_%s_out.nc", var)
-  var_df <- read_ncdf_data(ncdf_fn, var, hru_seq)
-  dt_long <- rbind(dt_long, var_df)
+  dt_long <- c()
+  for(var in vars) {
+    # Read in the two datasets
+    ncdf_fn <- sprintf("historical_%s_out.nc", var)
+    var_df <- read_ncdf_data(ncdf_fn, var, hru_seq)
+    dt_long <- rbind(dt_long, var_df)
+  }
+  
+  #######################
+  # Find data.table equivalent to "separate"
+  # dt_long_sep <- tidyr::separate(dt_long, year_doy, c("year", "doy"), "_")
+  # Doesn't seem that much faster ...
+  dt_long[, c("year", "doy") := tstrsplit(year_doy, "_", fixed=TRUE)]
+  dt_long[, year_doy := NULL]
+  
+  #######################
+  
+  # `fill = NA` to account for missing dates at beginning 
+  #   of 1980 and end of 2019
+  # This spreads + sums the values! Takes ~ 10 sec
+  dt_wide <- dcast(dt_long, hruid+year ~ doy, fun=sum, fill=NA)
+  dt_wide[, year := NULL]
+  
+  all_hru_quantiles_list <- lapply(hru_seq, function(hruid_i) {
+    
+    hru_data <- dt_wide[hruid == hruid_i,]
+    hru_data[, hruid := NULL]
+    
+    doy_quantile_list <- lapply(1:365, function(target_doy, df) {
+      target_doy_seq <- get_doy_sequence(target_doy)
+      target_doy_values <- extract_doy_cols_to_vec(df, target_doy_seq)
+      target_doy_quantile_df <- get_quantile_df(target_doy_values, target_doy_seq, target_doy)
+      return(target_doy_quantile_df)
+    }, df = hru_data)
+    
+    hru_quantiles_df <- do.call("rbind", doy_quantile_list)
+    hru_quantiles_df <- cbind(hruid = hruid_i, hru_quantiles_df)
+    
+    return(hru_quantiles_df)
+  })
+  
+  all_hru_quantiles_df <- do.call("rbind", all_hru_quantiles_list)
+  
+  fwrite(all_hru_quantiles_df, quantile_fn)
+  
+  # Timekeeping to see how long it takes
+  end <- Sys.time()
+  time_passed <- end - start
+  fwrite(list(start = as.character(start), 
+              end = as.character(end), 
+              time_passed = time_passed), 
+         sprintf("grouped_quantiles/time_passed_%s_%s.txt", hru_start, hru_end)) 
+  # finished in 5 min for 1:1000
+} else {
+  message(sprintf("Quantiles already complete for HRUs %s to %. Delete or rename the file to override and re-calculate.", hru_start, hru_end))
 }
-
-#######################
-# Find data.table equivalent to "separate"
-# dt_long_sep <- tidyr::separate(dt_long, year_doy, c("year", "doy"), "_")
-# Doesn't seem that much faster ...
-dt_long[, c("year", "doy") := tstrsplit(year_doy, "_", fixed=TRUE)]
-dt_long[, year_doy := NULL]
-
-#######################
-
-# `fill = NA` to account for missing dates at beginning 
-#   of 1980 and end of 2019
-# This spreads + sums the values! Takes ~ 10 sec
-dt_wide <- dcast(dt_long, hruid+year ~ doy, fun=sum, fill=NA)
-dt_wide[, year := NULL]
-
-all_hru_quantiles_list <- lapply(hru_seq, function(hruid_i) {
-  
-  hru_data <- dt_wide[hruid == hruid_i,]
-  hru_data[, hruid := NULL]
-  
-  doy_quantile_list <- lapply(1:365, function(target_doy, df) {
-    target_doy_seq <- get_doy_sequence(target_doy)
-    target_doy_values <- extract_doy_cols_to_vec(df, target_doy_seq)
-    target_doy_quantile_df <- get_quantile_df(target_doy_values, target_doy_seq, target_doy)
-    return(target_doy_quantile_df)
-  }, df = hru_data)
-  
-  hru_quantiles_df <- do.call("rbind", doy_quantile_list)
-  hru_quantiles_df <- cbind(hruid = hruid_i, hru_quantiles_df)
-  
-  return(hru_quantiles_df)
-})
-
-all_hru_quantiles_df <- do.call("rbind", all_hru_quantiles_list)
-
-quantile_fn <- sprintf("grouped_quantiles/total_storage_quantiles_%s_to_%s.csv", head(hru_seq, 1), tail(hru_seq, 1))
-fwrite(all_hru_quantiles_df, quantile_fn)
-
-# Timekeeping to see how long it takes
-end <- Sys.time()
-time_passed <- end - start
-fwrite(list(start = as.character(start), 
-            end = as.character(end), 
-            time_passed = time_passed), 
-       sprintf("time_passed_%s_%s.txt", head(hru_seq, 1), tail(hru_seq, 1))) 
-# finished in 5 min for 1:1000
