@@ -11,11 +11,11 @@ pipeline {
         choice(choices: ['test', 'qa', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
   }
   stages {
-  	stage('Clean Workspace') {
-	  steps{
-		cleanWs()
-	  }
-	}
+    stage('Clean Workspace') {
+      steps{
+        cleanWs()
+      }
+    }
     stage('Checkout repo and pull model output from S3') {
       steps {
         sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
@@ -33,6 +33,7 @@ pipeline {
         // May need to actually use yesterday's date depending on what time of day this runs
         //sh 'DATE=$(date -d "yesterday 13:00" "+%Y_%m_%d"); wget https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/application/nhm/output/data/climate_${DATE}.nc'
         sh '''
+          rm -f *.nc
           PATTERN="*.nc"
           aws s3 sync s3://owi-common-resources/resources/application/nhm/output/data/ . --exclude "*" --include "${PATTERN}"
           aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/model_output/ . --exclude "*" --include "all_quantiles.rds"
@@ -81,4 +82,26 @@ pipeline {
       }
     }
   }
+    post {
+        success {
+            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            subject: "Success: ${currentBuild.fullDisplayName}",
+            body: "Pipeline finished successfully ${env.BUILD_URL}"
+        }
+        unstable {
+            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            subject: "Unstable: ${currentBuild.fullDisplayName}",
+            body: "Pipeline is unstable ${env.BUILD_URL}"
+        }
+        failure {
+            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            subject: "Failure: ${currentBuild.fullDisplayName}",
+            body: "Pipeline failed ${env.BUILD_URL}"
+        }
+        changed {
+            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            subject: "Changes: ${currentBuild.fullDisplayName}",
+            body: "Pipeline detected changes ${env.BUILD_URL}"
+        }
+    }  
 }

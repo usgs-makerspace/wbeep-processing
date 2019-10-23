@@ -41,3 +41,35 @@ Ideally, rather than working in your home dir, email Natalya Rapstine (nrapstine
 1. When that is complete, you can kick off the final process which will combine all of HRU files into one quantiles file called `all_quantiles-[date].rds`. To start, execute `sbatch combine_hru_quantiles.slurm`.
 
 That should be everything! The resulting quantiles RDS file will need to be manually uploaded to the appropriate S3 bucket. You can now delete the files on your Yeti root directory (and you should to free up space).
+
+## Subsetting the historical NetCDF files to a single day
+
+We are doing this to be able to troubleshoot the viz while the model is still running. I wanted to document how I did it in case we need to do it again in the future (or when we want to see what a different date looks like). The resulting files can be used as input to the `process_model_output.R` step.
+
+1. Make sure you have the historic files. They are in the form `historical_[var]_out.nc`.
+1. Login to Yeti, `ssh user@yeti.cr.usgs.gov`
+1. Start a new interactive session using, `sinteractive -A iidd -p normal -n 1 -t 00:30:00`
+1. Load the module to subset and save NetCDF files with `module load tools/nco-4.7.8-gnu`.
+1. Identify which day you would like to use. For this example, I am using `2018-05-06`.
+1. Figure out the appropriate NetCDF time index based on your chosen date: Start an R session by typing `R` and hitting enter. Then run the following code (it shouldn't matter which NetCDF file you use to figure this out). Take the resulting number and use it in to the `ncks` command in the next step. For `2018-05-06`, this value was `13731`. End the R session by running `q()`.
+
+    ```
+    library(ncdf4)
+    nc <- nc_open("historical_soil_moist_tot_out.nc")
+    time_att <- ncdf4::ncatt_get(nc, "time")
+    time_start <- as.Date(gsub("days since ", "", time_att$units))
+    as.numeric(as.Date("2018-05-06") - time_start)
+    ```
+
+1. Create the subsets by running the code below with your chosen day and the corresponding NetCDF index substituted where appropriate. For this example, the day is `2018-05-06` and the corresponding NetCDF time index is `4449`.
+
+    ```
+    vars='dprst_stor_hru soil_moist_tot hru_intcpstor pkwater_equiv hru_impervstor gwres_stor'
+    for v in $vars; do
+        f='historical_'$v'_out.nc'
+        out_f='2018-05-06_'$v'.nc'
+        ncks -d time,13731 $f $out_f
+    done
+    ```
+
+You should now have a set of subset NetCDF files named with the appropriate date in your environment.
