@@ -70,32 +70,6 @@ read_ncdf_data <- function(fn, varid, hru_seq) {
   
   return(dt_long)
 }
-get_doy_sequence <- function(target_doy, window = 5) {
-  
-  # Create doy vector that may extend into negative or beyond 365
-  seq_doy <- (-window:window) + target_doy 
-  
-  # If below 1 or beyond 365, wrap around so all numbers are between 1 and 365
-  seq_doy_real <- ((seq_doy - 1) %% 365) + 1 
-  
-  ############# WORKING ON THIS
-  # Still need to figure out best solution for leap years
-  #############
-  return(seq_doy_real)
-}
-extract_doy_cols_to_vec <- function(dt, doy_seq) {
-  doy_seq_colnames <- sprintf("%03d", doy_seq)
-  target_dt <- dt[, doy_seq_colnames, with=FALSE]
-  target_vector <- unlist(target_dt, use.names = FALSE)
-  return(target_vector)
-}
-get_quantile_mat <- function(target_doy_values, probs = c(0.10, 0.25, 0.75, 0.90)) {
-  target_doy_quantiles <- quantile(target_doy_values, 
-                                   probs = probs, 
-                                   type = 6,
-                                   na.rm = TRUE)
-  return(target_doy_quantiles)
-}
 ########## ////// ########## 
 
 # Identify task id from yeti environment & convert to HRU ids ----
@@ -143,10 +117,27 @@ if(!file.exists(quantile_fn)) {
     
     all_doy_seq <- 1:365
     doy_quantile_list <- lapply(doy_seq, function(target_doy, dt) {
-      target_doy_seq <- get_doy_sequence(target_doy)
-      target_doy_values <- extract_doy_cols_to_vec(dt, target_doy_seq)
-      target_doy_quantile_mat <- get_quantile_mat(target_doy_values)
-      return(target_doy_quantile_mat)
+      
+      # Get doy sequence
+      # Create doy vector that may extend into negative or beyond 365
+      # If below 1 or beyond 365, wrap around so all numbers are between 1 and 365
+      target_doy_seq_literal <- (-5:5) + target_doy # 5 = window to use around date
+      target_doy_seq <- ((target_doy_seq - 1) %% 365) + 1 
+      ############# WORKING ON THIS
+      # Still need to figure out best solution for leap years
+      #############
+      
+      # Extract doy cols into a vector
+      doy_seq_colnames <- sprintf("%03d", target_doy_seq)
+      target_dt <- dt[, doy_seq_colnames, with=FALSE]
+      target_doy_values <- unlist(target_dt, use.names = FALSE)
+      
+      # Calculate quantiles
+      target_doy_quantiles <- quantile(target_doy_values, 
+                                       probs = c(0.10, 0.25, 0.75, 0.90), 
+                                       type = 6, na.rm = TRUE)
+      
+      return(target_doy_quantiles)
     }, dt = hru_data)
     
     hru_quantiles_mat <- do.call("rbind", doy_quantile_list)
