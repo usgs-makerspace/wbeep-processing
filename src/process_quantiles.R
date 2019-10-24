@@ -42,8 +42,7 @@ task_id_to_hru_seq <- function(task_id, n_hrus_per_task = 1000) {
 ########## ////// ########## 
 
 # Identify task id from yeti environment & convert to HRU ids ----
-# task_id <- as.numeric(Sys.getenv('SLURM_ARRAY_TASK_ID', 'NA'))
-task_id <- 2 # Will uncomment once setup with slurm
+task_id <- as.numeric(Sys.getenv('SLURM_ARRAY_TASK_ID', 'NA'))
 hru_seq <- task_id_to_hru_seq(task_id)
 hru_start <- head(hru_seq, 1)
 hru_end <- tail(hru_seq, 1)
