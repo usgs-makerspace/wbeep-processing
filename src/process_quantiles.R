@@ -39,37 +39,6 @@ task_id_to_hru_seq <- function(task_id, n_hrus_per_task = 1000) {
   hru_seq <- hru_id_start:hru_id_end
   return(hru_seq)
 }
-read_ncdf_data <- function(fn, varid, hru_seq) {
-  
-  # The file is NetCDF
-  nc <- nc_open(fn)
-  
-  message(sprintf("Reading in NetCDF data for %s", varid))
-  # Only load rows for current HRUs
-  data_nc <- ncvar_get(nc, varid, 
-                       start = c(head(hru_seq, 1), 1),
-                       count = c(length(hru_seq), -1))
-  time <- ncvar_get(nc, "time")
-  hruid <- ncvar_get(nc, "hruid")[hru_seq]
-  
-  # Convert ncdf4 times to R dates
-  time_att <- ncdf4::ncatt_get(nc, "time")
-  time_start <- as.Date(gsub("days since ", "", time_att$units))
-  time_fixed <- time + time_start # creates dates from the "days since" var
-  
-  # Keep only complete years of data
-  # data_years <- format(time_fixed, "%Y")
-  # n_days_per_year <- table(data_years)
-  # data_years_complete <- names(n_days_per_year)[n_days_per_year >= 365]
-  
-  year_doy_vector <- format(time_fixed, "%Y_%j")
-  dt <- as.data.table(data_nc)
-  dt[, hruid := hru_seq]
-  names(dt) <- c(year_doy_vector, "hruid")
-  dt_long <- melt(dt, id.vars = "hruid", variable.name = "year_doy")
-  
-  return(dt_long)
-}
 ########## ////// ########## 
 
 # Identify task id from yeti environment & convert to HRU ids ----
@@ -93,13 +62,49 @@ if(!file.exists(quantile_fn)) {
     "dprst_stor_hru"
   )
   
-  dt_long <- c()
+  vars_data <- c()
   for(var in vars) {
-    # Read in the two datasets
-    ncdf_fn <- sprintf("historical_%s_out.nc", var)
-    var_df <- read_ncdf_data(ncdf_fn, var, hru_seq)
-    dt_long <- rbind(dt_long, var_df)
+    
+    message(sprintf("Reading in NetCDF data for %s", var))
+    
+    # The file is NetCDF
+    fn <- sprintf("historical_%s_out.nc", var)
+    nc <- nc_open(fn)
+    
+    # Only load rows for current HRUs
+    data_nc <- ncvar_get(nc, var, start = c(head(hru_seq, 1), 1), count = c(length(hru_seq), -1))
+    
+    if(length(vars_data) == 0) {
+      vars_data <- data_nc
+    } else {
+      vars_data <- vars_data + data_nc
+    }
+    
+    # If it's the last one, add the time details
+    if(var == tail(vars, 1)) {
+      time <- ncvar_get(nc, "time")
+      time_att <- ncdf4::ncatt_get(nc, "time")
+      time_start <- as.Date(gsub("days since ", "", time_att$units))
+      time_fixed <- time + time_start # creates dates from the "days since" var
+    }
+    
+    nc_close(nc)
+    
   }
+  
+  # Keep only complete years of data
+  # data_years <- format(time_fixed, "%Y")
+  # n_days_per_year <- table(data_years)
+  # data_years_complete <- names(n_days_per_year)[n_days_per_year >= 365]
+  year_doy_vector <- format(time_fixed, "%Y_%j")
+  dt <- as.data.table(vars_data)
+  dt[, hruid := hru_seq]
+  names(dt) <- c(year_doy_vector, "hruid")
+  dt_long <- melt(dt, id.vars = "hruid", variable.name = "year_doy")
+  
+  #######################
+  # test if dcast with `c` is faster than `sum`
+  #######################
   
   # Split year_doy into separate columns
   # Converting to numeric (type_convert = TRUE) slows down
@@ -108,7 +113,7 @@ if(!file.exists(quantile_fn)) {
   # `fill = NA` to account for missing dates at beginning 
   #   of 1980 and end of 2019
   # This spreads + sums the values! Takes ~ 10 sec
-  dt_wide <- dcast(dt_long, hruid+year ~ doy, fun=sum, fill=NA)
+  dt_wide <- dcast(dt_long, hruid+year ~ doy, fun=c, fill=NA)
   dt_wide[, year := NULL]
   
   all_hru_quantiles_list <- lapply(hru_seq, function(hruid_i) {
