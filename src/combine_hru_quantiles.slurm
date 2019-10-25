@@ -3,7 +3,7 @@
 #SBATCH -c 1                            # number of cores per task
 #SBATCH -p UV,normal              # choose both partitions
 #SBATCH -A iidd                        # your account
-#SBATCH --time=00:5:00        # time at which the process will be cancelled if unfinished
+#SBATCH --time=00:10:00        # time at which the process will be cancelled if unfinished
 #SBATCH --mem=10GB
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=lplatt@usgs.gov
