@@ -11,6 +11,9 @@
 #SBATCH --export=ALL
 #SBATCH --array=1-110 # 109,951 HRUs / 1000 HRUs per task = 110 tasks
 
+mkdir logs
+mkdir grouped_quantiles
+
 module load R/3.5.1-gcc7.1.0
 
 srun Rscript src/process_quantiles.R
