@@ -3,14 +3,12 @@
 #SBATCH -c 1                            # number of cores per task
 #SBATCH -p UV,normal              # choose both partitions
 #SBATCH -A iidd                        # your account
-#SBATCH --time=00:05:00        # time at which the process will be cancelled if unfinished
+#SBATCH --time=00:5:00        # time at which the process will be cancelled if unfinished
 #SBATCH --mem=10GB
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=mhines@usgs.gov
-#SBATCH -o /logs/combine.log            # log file for each jobid (can insert %A_%a for each array id task if needed)
+#SBATCH --mail-user=lplatt@usgs.gov
+#SBATCH -o logs/slurm_combine.out            # log file for each jobid (can insert %A_%a for each array id task if needed)
 #SBATCH --export=ALL
-
-mkdir -p logs
 
 module load R/3.5.1-gcc7.1.0
 
