@@ -10,7 +10,6 @@
 #SBATCH --mail-user=mhines@usgs.gov
 #SBATCH --export=ALL
 #SBATCH --array=1-110 # 109,951 HRUs / 1000 HRUs per task = 110 tasks
-#SBATCH -t 1-200%5
 
 module load R/3.5.1-gcc7.1.0
 
