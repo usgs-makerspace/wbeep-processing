@@ -6,7 +6,7 @@
 library(ncdf4) 
 library(data.table)
 
-n_hrus <- 10000#109951
+n_hrus <- 109951
 n_hrus_per_group <- 1000
 
 start_of_loop <- Sys.time()
