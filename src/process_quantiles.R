@@ -11,17 +11,13 @@
 #   before and 5 values after to calculate the thresholds 
 #   for each day.
 
-# Total storage = pkwater_equiv + soil_moist_tot + hru_intcpstor +
-#                 hru_impervstor + gwres_stor + dprst_stor_hru
-
 # TO DO: 
 #   1. Use task_id to loop through groups of HRUs using slurm - haven't been able to get a test working
-#   2. Calc for probs = seq(0, 1, by = 0.05)
-#   3. Fix this to work with incomplete years & leap years
-#   4. Add -Inf and +Inf in `combine_hru_quantiles` right before saving.
+#   2. Fix this to work with incomplete years & leap years
+#   3. Add check to test that HRUs and dates across 6 files match.
 
 start <- Sys.time()
-library(ncdf4) 
+
 library(data.table)
 
 ########## Functions ########## 
@@ -46,64 +42,19 @@ task_id <- as.numeric(Sys.getenv('SLURM_ARRAY_TASK_ID', 'NA'))
 hru_seq <- task_id_to_hru_seq(task_id)
 hru_start <- head(hru_seq, 1)
 hru_end <- tail(hru_seq, 1)
-quantile_fn <- sprintf("grouped_quantiles/total_storage_quantiles_%s_to_%s.csv", hru_start, hru_end)
+
+message(sprintf("Started this task at %s", Sys.time()))
+
+total_storage_group_data <- feather::read_feather(sprintf("grouped_total_storage/total_storage_data_%s_to_%s.feather", hru_start, hru_end))
+quantile_fn <- sprintf("grouped_quantiles/total_storage_quantiles_%s_to_%s.feather", hru_start, hru_end)
 
 if(!file.exists(quantile_fn)) {
 
-  message(sprintf("Started this task at %s", Sys.time()))
-
-  vars <- c(
-    "soil_moist_tot",
-    "pkwater_equiv",
-    "hru_intcpstor", 
-    "hru_impervstor",
-    "gwres_stor", 
-    "dprst_stor_hru"
-  )
+  message("Reformatting data")
   
-  vars_data <- c()
-  for(var in vars) {
-    
-    message(sprintf("Reading in NetCDF data for %s", var))
-    
-    # The file is NetCDF
-    fn <- sprintf("historical_%s_out.nc", var)
-    nc <- nc_open(fn)
-    
-    # Only load rows for current HRUs
-    data_nc <- ncvar_get(nc, var, start = c(head(hru_seq, 1), 1), count = c(length(hru_seq), -1))
-    
-    if(length(vars_data) == 0) {
-      vars_data <- data_nc
-    } else {
-      vars_data <- vars_data + data_nc
-    }
-    
-    # If it's the last one, add the time details
-    if(var == tail(vars, 1)) {
-      time <- ncvar_get(nc, "time")
-      time_att <- ncdf4::ncatt_get(nc, "time")
-      time_start <- as.Date(gsub("days since ", "", time_att$units))
-      time_fixed <- time + time_start # creates dates from the "days since" var
-    }
-    
-    nc_close(nc)
-    
-  }
-  
-  # Keep only complete years of data
-  # data_years <- format(time_fixed, "%Y")
-  # n_days_per_year <- table(data_years)
-  # data_years_complete <- names(n_days_per_year)[n_days_per_year >= 365]
-  year_doy_vector <- format(time_fixed, "%Y_%j")
-  dt <- as.data.table(vars_data)
-  dt[, hruid := hru_seq]
-  names(dt) <- c(year_doy_vector, "hruid")
+  # Reshape data
+  dt <- as.data.table(total_storage_group_data)
   dt_long <- melt(dt, id.vars = "hruid", variable.name = "year_doy")
-  
-  #######################
-  # test if dcast with `c` is faster than `sum`
-  #######################
   
   # Split year_doy into separate columns
   # Converting to numeric (type_convert = TRUE) slows down
@@ -111,11 +62,15 @@ if(!file.exists(quantile_fn)) {
   
   # `fill = NA` to account for missing dates at beginning 
   #   of 1980 and end of 2019
-  # This spreads + sums the values! Takes ~ 10 sec
+  # This spreads & puts values per doy in a column
   dt_wide <- dcast(dt_long, hruid+year ~ doy, fun=c, fill=NA)
   dt_wide[, year := NULL]
   
+  message(sprintf("Start calculating quantiles at %s", Sys.time()))
+  
   all_hru_quantiles_list <- lapply(hru_seq, function(hruid_i) {
+
+    message(sprintf("Starting quant calc %s ...", hruid_i))
     
     hru_data <- dt_wide[hruid == hruid_i,]
     
@@ -139,7 +94,7 @@ if(!file.exists(quantile_fn)) {
       
       # Calculate quantiles
       target_doy_quantiles <- quantile(target_doy_values, 
-                                       probs = c(0.10, 0.25, 0.75, 0.90), 
+                                       probs = seq(0.05, 0.95, by=0.05), #c(0.10, 0.25, 0.75, 0.90) 
                                        type = 6, na.rm = TRUE)
       
       return(target_doy_quantiles)
@@ -151,17 +106,18 @@ if(!file.exists(quantile_fn)) {
     return(hru_quantiles_mat)
   })
   
+  message(sprintf("Complete calc & start combining quantiles at %s", Sys.time()))
+  
   all_hru_quantiles_df <- do.call("rbind", all_hru_quantiles_list)
   
-  fwrite(all_hru_quantiles_df, quantile_fn)
+  feather::write_feather(as.data.frame(all_hru_quantiles_df), quantile_fn)
   
   # Timekeeping to see how long it takes
   end <- Sys.time()
   time_passed <- end - start
-  fwrite(list(start = as.character(start), 
-              end = as.character(end), 
-              time_passed = time_passed), 
-         sprintf("grouped_quantiles/time_passed_%s_%s.txt", hru_start, hru_end)) 
+  fwrite(data.frame(name = c("start", "end", "time_passed"),
+                    value = c(start, end, time_passed)), 
+                         sprintf("grouped_quantiles/time_passed_%s_%s.txt", hru_start, hru_end)) 
   # finished in 5 min for 1:1000
 } else {
   message(sprintf("Quantiles already complete for HRUs %s to %s. Delete or rename the file to override and re-calculate.", hru_start, hru_end))

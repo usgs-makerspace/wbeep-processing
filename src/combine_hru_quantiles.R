@@ -9,7 +9,7 @@ files_to_combine <- list.files(path = "grouped_quantiles",
                                pattern = "total_storage_quantiles",
                                full.names = TRUE)
 #gets daily data
-file_contents_list <- lapply(files_to_combine, fread)
+file_contents_list <- lapply(files_to_combine, feather::read_feather)
 # print(proc.time() - ptm)
 # ptm <- proc.time()
 # print(pryr::object_size(file_contents_list))
@@ -38,6 +38,7 @@ combined_data <- do.call("rbind", file_contents_list)# %>%
 
 # Add -inf and +inf here since it will be the same for all 
 original_quantiles <- tail(names(combined_data), -2)
+combined_data <- as.data.table(combined_data)
 combined_data[, "0%" := -Inf]
 combined_data[, "100%" := Inf]
 setcolorder(combined_data, c("hruid", "DOY", "0%",
