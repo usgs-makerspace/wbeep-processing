@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=sum_storage     # name that you chose
-#SBATCH -c 8                            # number of cores per task
-#SBATCH -p UV              # slow on normal to read in files, try UV only
+#SBATCH -c 8                            # number of cores per task, unsure on UV
+#SBATCH -p UV,normal              # seems slow on normal to read in files
 #SBATCH -A iidd                        # your account
-#SBATCH --time=00:30:00        # time at which the process will be cancelled if unfinished
+#SBATCH --time=00:45:00        # time at which the process will be cancelled if unfinished
 #SBATCH --mem=100GB
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=lplatt@usgs.gov

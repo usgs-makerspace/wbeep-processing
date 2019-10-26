@@ -68,8 +68,16 @@ for(g in 1:n_groups) {
   # Try feather, too
   hruid_start <- ((g-1)*n_hrus_per_group + 1) # which hru to start with
   hruid_end <- hruid_start + (n_hrus_per_group-1) # which hru to end with
+  hruid_end <- ifelse(hruid_end > n_hrus, yes = n_hrus, no = hruid_end)
   
-  message("... subsetting large data to just this group of HRUs ... ")
+  hru_group_fn <- sprintf("grouped_total_storage/total_storage_data_%s_to_%s.feather", hruid_start, hruid_end)
+  
+  if(file.exists(hru_group_fn)) {
+    message(sprintf("Already completed %s to %s, skipping ...", hruid_start, hruid_end))
+    next
+  }
+  
+  message(sprintf("... subsetting large data for %s to %s ...", hruid_start, hruid_end))
   hru_group_data <- vars_data[hruid_start:hruid_end,] # subset rows to just HRUs in this group
   
   # Keep only complete years of data
@@ -85,7 +93,7 @@ for(g in 1:n_groups) {
   # With fread, took 58 seconds & average file was 125 MB
   
   #fwrite(hru_group_data, sprintf("grouped_total_storage/total_storage_data_%s_to_%s.csv", hruid_start, hruid_end))
-  feather::write_feather(as.data.frame(dt), sprintf("grouped_total_storage/total_storage_data_%s_to_%s.feather", hruid_start, hruid_end))
+  feather::write_feather(as.data.frame(dt), hru_group_fn)
 }
 
 end_of_split <- Sys.time()
