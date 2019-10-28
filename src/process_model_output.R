@@ -52,7 +52,13 @@ get_nonzero_duplicate_indices <- function(x) {
 
 find_value_category <- function(value, labels, ...) {
   breaks <- as.numeric(list(...))
-  #first, check if there are non-zero duplicate quantiles
+  
+  # First, make sure actual breaks exist
+  if(all(is.na(breaks))) {
+    final_label <- "Undefined"
+  } else {
+  
+    # then, check if there are non-zero duplicate quantiles
     dup_indices <- get_nonzero_duplicate_indices(breaks)
     if(any(dup_indices)) {
       breaks <- breaks[!dup_indices]
@@ -77,6 +83,8 @@ find_value_category <- function(value, labels, ...) {
     } else {
       final_label <- cut(value, breaks, labels, include.lowest = TRUE)
     }
+  }
+  
   final_label <- as.character(final_label)
   return(final_label)
 }
