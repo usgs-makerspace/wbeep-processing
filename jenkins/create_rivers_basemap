@@ -42,7 +42,7 @@ pipeline {
       }
       steps {
         sh "mkdir ${WORKSPACE}/nhd_order_grouped"
-        sh 'tippecanoe -zg --detect-shared-borders --simplify-only-low-zooms --drop-densest-as-need --simplification=5 --output-to-directory nhd_order_grouped'
+        sh 'tippecanoe -zg --simplify-only-low-zooms --drop-densest-as-need --simplification=5 --output-to-directory nhd_order_grouped'
       }
     }
     stage('push to S3') {
