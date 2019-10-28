@@ -4,9 +4,9 @@
 #SBATCH -p UV,normal              # choose both partitions
 #SBATCH -A iidd                        # your account
 #SBATCH --time=00:30:00        # time at which the process will be cancelled if unfinished
-#SBATCH --mem=10GB
+#SBATCH --mem=32GB
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=lplatt@usgs.gov
+#SBATCH --mail-user=mhines@usgs.gov
 #SBATCH -o logs/slurm_combine.out            # log file for each jobid (can insert %A_%a for each array id task if needed)
 #SBATCH --export=ALL
 
