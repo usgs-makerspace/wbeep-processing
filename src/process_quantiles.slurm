@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=process_quantiles     # name that you chose
 #SBATCH -p normal,UV              # the partition you want to use, for this case prod is best
-#SBATCH -c 8
+#SBATCH -c 1
 #SBATCH -A iidd                 # your account
 #SBATCH -o logs/slurm-%A_%a-%j.out
 #SBATCH --time=00:30:00        # time at which the process will be cancelled if unfinished
