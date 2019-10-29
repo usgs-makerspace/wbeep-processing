@@ -70,14 +70,17 @@ for(g in 1:n_groups) {
   hruid_end <- hruid_start + (n_hrus_per_group-1) # which hru to end with
   hruid_end <- ifelse(hruid_end > n_hrus, yes = n_hrus, no = hruid_end)
   
-  hru_group_fn <- sprintf("grouped_total_storage/total_storage_data_%s_to_%s.feather", hruid_start, hruid_end)
+  hruid_start_char <- sprintf("%.0f", hruid_start) # will stop anything that has scientific notation
+  hruid_end_char <- sprintf("%.0f", hruid_end)
+  
+  hru_group_fn <- sprintf("grouped_total_storage/total_storage_data_%s_to_%s.feather", hruid_start_char, hruid_end_char)
   
   if(file.exists(hru_group_fn)) {
-    message(sprintf("Already completed %s to %s, skipping ...", hruid_start, hruid_end))
+    message(sprintf("Already completed %s to %s, skipping ...", hruid_start_char, hruid_end_char))
     next
   }
   
-  message(sprintf("... subsetting large data for %s to %s ...", hruid_start, hruid_end))
+  message(sprintf("... subsetting large data for %s to %s ...", hruid_start_char, hruid_end_char))
   hru_group_data <- vars_data[hruid_start:hruid_end,] # subset rows to just HRUs in this group
   
   # Keep only complete years of data
