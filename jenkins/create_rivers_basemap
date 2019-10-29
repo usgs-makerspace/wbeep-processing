@@ -1,7 +1,7 @@
 pipeline {
   agent {
         node {
-            label 'node:slave'
+            label 'team:makerspace'
         }
     }
   parameters {
@@ -47,7 +47,7 @@ pipeline {
     }
     stage('push to S3') {
       steps { 
-        sh 'aws s3 sync --delete nhd_order_grouped s3://maptiles-prod-website/nhdstreams_grouped --recursive --content-encoding gzip --content-type application/x-protobuf'
+        sh 'aws s3 sync --delete nhd_order_grouped s3://maptiles-prod-website/nhdstreams_grouped --content-encoding gzip --content-type application/x-protobuf'
       }
     }
   }
