@@ -29,19 +29,20 @@ seven <- st_read('nhd_geojson/nhdplus_order_7.geojson')
 eight <- st_read('nhd_geojson/nhdplus_order_8.geojson')
 nine <- st_read('nhd_geojson/nhdplus_order_9.geojson')
 minusnine <- st_read('nhd_geojson/nhdplus_order_minus_9.geojson')
+ten <- st_read('nhd_geojson/nhdplus_order_10.geojson')
 
 
 ############################
 #combine a few individual files to make inputs for grouped tileset
 
-#most uses all of the stream orders 0-9 (and minus nine)
-most_detail <- do.call("rbind", list(one, two, three, four, five, six, seven, eight, nine, minusnine))
+#most uses all of the stream orders 1-10 (and minus nine)
+most_detail <- do.call("rbind", list(one, two, three, four, five, six, seven, eight, nine, minusnine, ten))
 st_write(most_detail, dsn="nhd_geojson/most_detail.geojson")
 
-#medium uses just 2-9
-medium_detail <- do.call("rbind", list(two, three, four, five, six, seven, eight, nine, minusnine))
+#medium uses just 2-10
+medium_detail <- do.call("rbind", list(two, three, four, five, six, seven, eight, nine, minusnine, ten))
 st_write(medium_detail, dsn="nhd_geojson/medium_detail.geojson")
 
-#least uses just 4-9
-least_detail <- do.call("rbind", list(four, five, six, seven, eight, nine, minusnine))
+#least uses just 4-10
+least_detail <- do.call("rbind", list(four, five, six, seven, eight, nine, minusnine, ten))
 st_write(least_detail, dsn="nhd_geojson/least_detail.geojson")
