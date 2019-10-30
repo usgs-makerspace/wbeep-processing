@@ -40,8 +40,8 @@ task_id_to_hru_seq <- function(task_id, n_hrus_per_task = 1000) {
 # Identify task id from yeti environment & convert to HRU ids ----
 task_id <- as.numeric(Sys.getenv('SLURM_ARRAY_TASK_ID', 'NA'))
 hru_seq <- task_id_to_hru_seq(task_id)
-hru_start <- head(hru_seq, 1)
-hru_end <- tail(hru_seq, 1)
+hru_start <- sprintf("%.0f", head(hru_seq, 1)) # prevents hruid from being in scientific notation as character
+hru_end <- sprintf("%.0f", tail(hru_seq, 1))
 
 message(sprintf("Started this task at %s", Sys.time()))
 
