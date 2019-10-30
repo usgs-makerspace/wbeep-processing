@@ -42,7 +42,7 @@ pipeline {
       }
       steps {
         sh "mkdir ${WORKSPACE}/nhd_order_grouped"
-        sh 'tippecanoe -zg --simplify-only-low-zooms --no-simplification-of-shared-nodes --simplification=5 --output-to-directory nhd_order_grouped most_detail.geojson medium_detail.geojson least_detail.geojson'
+        sh 'tippecanoe -zg --simplify-only-low-zooms --no-simplification-of-shared-nodes --drop-fraction-as-needed --no-feature-limit --simplification=5 --output-to-directory nhd_order_grouped most_detail.geojson medium_detail.geojson least_detail.geojson'
       }
     }
     stage('push to S3') {
