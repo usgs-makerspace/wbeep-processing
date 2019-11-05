@@ -68,6 +68,7 @@ pipeline {
           FILES=($PATTERN)
           DATE="${FILES:0:10}"
           aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/model_output_categorized.csv
+		  aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/model_output_csv/model_output_categorized_${DATE}.csv
           echo ${DATE} > date.txt
           aws s3 cp date.txt s3://prod-owi-resources/resources/Application/wbeep/${TIER}/date.txt
         '''
