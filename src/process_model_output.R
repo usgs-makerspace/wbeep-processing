@@ -4,7 +4,8 @@ library(ncdf4)
 library(dplyr)
 
 args <- commandArgs(trailingOnly=TRUE)
-# today <- args[1] #today <- "2019-07-31"
+today <- args[1] #today <- "2019-07-31"
+
 source("src/validate_oNHM_daily_output.R") # load code to test model data
 source("src/validate_total_storage_categorized.R") # load code to test output of this categorization
 
