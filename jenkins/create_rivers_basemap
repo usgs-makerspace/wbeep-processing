@@ -1,7 +1,7 @@
 pipeline {
   agent {
         node {
-            label 'node:slave'
+            label 'team:makerspace'
         }
     }
   parameters {
@@ -27,7 +27,7 @@ pipeline {
                           submoduleCfg: [],
                           userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
                         ])
-        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/test/geojson . --include "*"'
+        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/nhd_plus_stream_order_geojson . --include "*detail.geojson"'
       }
     }
     stage('create tileset') {
@@ -41,13 +41,13 @@ pipeline {
         } 
       }
       steps {
-        sh "mkdir ${WORKSPACE}/basemap"
-        sh 'tippecanoe -Z2 -z10 --force --output-to-directory basemap counties.geojson neighboringcountry.json states.geojson'
+        sh "mkdir ${WORKSPACE}/nhd_order_grouped"
+        sh 'tippecanoe -zg --simplify-only-low-zooms --no-simplification-of-shared-nodes --drop-fraction-as-needed --no-feature-limit --simplification=5 --output-to-directory nhd_order_grouped most_detail.geojson medium_detail.geojson least_detail.geojson'
       }
     }
     stage('push to S3') {
       steps { 
-        sh 'aws s3 sync --delete basemap s3://maptiles-prod-website/misctilesets/usstatecounties --content-encoding gzip --content-type application/x-protobuf'
+        sh 'aws s3 sync --delete nhd_order_grouped s3://maptiles-prod-website/nhdstreams_grouped --content-encoding gzip --content-type application/x-protobuf'
       }
     }
   }
@@ -55,22 +55,22 @@ pipeline {
         success {
             mail to: 'mhines@usgs.gov',
             subject: "Success: ${currentBuild.fullDisplayName}",
-            body: "Successful build of county, state, neighboringcountry tiles ${env.BUILD_URL}"
+            body: "Successful build of river tiles ${env.BUILD_URL}"
         }
         unstable {
             mail to: 'mhines@usgs.gov',
             subject: "Unstable: ${currentBuild.fullDisplayName}",
-            body: "Unstable build of county, state, neighboringcountry tiles ${env.BUILD_URL}"
+            body: "Unstable build of river tiles ${env.BUILD_URL}"
         }
         failure {
             mail to: 'mhines@usgs.gov',
             subject: "Failure: ${currentBuild.fullDisplayName}",
-            body: "Failed build of county, state, neighboringcountry tiles ${env.BUILD_URL}"
+            body: "Failed build of river tiles ${env.BUILD_URL}"
         }
         changed {
             mail to: 'mhines@usgs.gov',
             subject: "Changes: ${currentBuild.fullDisplayName}",
-            body: "Changes in build of county, state, neighboringcountry tiles ${env.BUILD_URL}"
+            body: "Changes in build of river tiles ${env.BUILD_URL}"
         }
     }
 }

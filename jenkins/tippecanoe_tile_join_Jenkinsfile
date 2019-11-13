@@ -8,7 +8,7 @@ pipeline {
         gitParameter name: 'BRANCH_TAG',
                      type: 'PT_BRANCH_TAG',
                      defaultValue: 'master'
-        choice(choices: ['test', 'qa', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+        choice(choices: ['test', 'qa', 'beta', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
   }
   stages {
 	stage('Clean Workspace') {
@@ -46,24 +46,14 @@ pipeline {
         } 
       }
       steps {
-        sh 'tile-join -pk --output-to-directory tiles -c model_output_categorized.csv tile_dir_simple5 --force' 
+        sh 'tile-join -pk --output-to-directory tiles -x DOY -x total_storage_today -x 0% -x 5% -x 10% -x 15% -x 20% -x 25% -x 30% -x 35% -x 40% -x 45% -x 50% -x 55% -x 60% -x 65% -x 70% -x 75% -x 80% -x 85% -x 90% -x 95% -x 100% -c model_output_categorized.csv tile_dir_simple5 --force' 
       }
     }
     stage('push to S3') {
       steps { 
-          script {
-                    if ("${TIER}" == "prod") {
-                        targetDomain = "s3://wbeep-prod-website"
-                    }   
-                    else if ("${TIER}" == "qa") {
-                        //only here for testing propagating variable
-                        // we aren't using tiles hosted here
-                        targetDomain = "s3://wbeep-qa-website"
-                    } 
-                    else {
-                        targetDomain = "s3://wbeep-test-website"
-                    }   
-            }
+        script {
+          targetDomain = "s3://wbeep-${TIER}-website"
+        }
         sh "aws s3 sync tiles ${targetDomain}/tiles --content-encoding gzip --content-type application/x-protobuf"
         sh "aws s3 cp date.txt ${targetDomain}/date/date.txt --content-encoding text/html --content-type text/plain"
       }
