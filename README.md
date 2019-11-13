@@ -79,11 +79,11 @@ You should now have a set of subset NetCDF files named with the appropriate date
 
 There are two docker images used in the processing steps --- one for R, and one for tippecanoe.  The built images are stored in the Docker registry at https://code.chs.usgs.gov/wma/iidd/wbeep-data-processing.  If you need to update the images, follow these steps:
 
-1. Make the appropriate changes to the Dockerfile, and make sure it builds locally using `docker-compose build` while in the directory containing both the Dockerfile and docker-compose.yml.  
+1. Make the appropriate changes to the Dockerfile, and make sure it builds locally by running `docker-compose build` in the terminal from the directory containing both the Dockerfile and docker-compose.yml.  
 
 2. Make a pull request and have it reviewed.  
 
-3. When the pull request is merged, it should trigger a Jenkins job that will build the image and push it to the docker registry tagged as `R-latest` or `tippecanoe-latest`.
+3. When the pull request is merged, it should trigger a Jenkins job (watching only the Dockerfile in the repo) that will build the image and push it to the docker registry tagged as `R-latest` or `tippecanoe-latest`.
 
 ### Docker image tagging
 
