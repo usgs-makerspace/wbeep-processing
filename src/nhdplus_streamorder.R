@@ -6,7 +6,6 @@ library(sf)
 library(dplyr)
 #this came from NHDplustools
 #probably need to work on Yeti, full unzipped .gdb of NHDPlus is 80GB
-
 geom <- readRDS('src/geom_relevant.rds') 
 
 for(order in unique(geom$StreamOrde)) {
