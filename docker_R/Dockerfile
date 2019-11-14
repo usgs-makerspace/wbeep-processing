@@ -31,7 +31,9 @@ RUN sudo apt-get remove --assume-yes libgdal-dev \
 
 RUN install2.r --error \
 	sf \
-	lwgeom 
+	lwgeom \
+	ncmeta \
+	assertthat
 
 RUN mkdir -p wbeep-processing &&\
     chown rstudio wbeep-processing
