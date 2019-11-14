@@ -73,3 +73,20 @@ We are doing this to be able to troubleshoot the viz while the model is still ru
     ```
 
 You should now have a set of subset NetCDF files named with the appropriate date in your environment.
+
+
+## Updating the Docker images
+
+There are two docker images used in the processing steps --- one for R, and one for tippecanoe.  The built images are stored in the Docker registry at https://code.chs.usgs.gov/wma/iidd/wbeep-data-processing.  If you need to update the images, follow these steps:
+
+1. Make the appropriate changes to the Dockerfile, and make sure it builds locally by running `docker-compose build` in the terminal from the directory containing both the Dockerfile and docker-compose.yml.  
+
+2. Make a pull request and have it reviewed.  
+
+3. When the pull request is merged, it should trigger a Jenkins job (watching only the Dockerfile in the repo) that will build the image and push it to the docker registry tagged as `R-latest` or `tippecanoe-latest`.
+
+### Docker image tagging
+
+Note that as of November 2019, we are not storing different tags for each Docker image, since we have not needed to make substantial environment changes.  Each build of the images is tagged as `[R/tippecanoe]-latest` and overwrites the older tag when it is pushed to the registry.  All the processing jobs are hard-coded to use these tagged images.  To revert, we would need to make the change in the Github repo and rebuild the image using the image build Jenkins job.   
+
+If in the future we want the ability to more easily switch between docker images, we may want to start tagging each image build uniquely with a version number, and then parameterize the docker image used in the data processing Jenkins jobs.  This would involve either using an automatically incrementing or manually set version number in the docker image build job, and adding an additional environment variable to all the processing jobs that sets the docker image used.   
