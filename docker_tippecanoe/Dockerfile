@@ -15,7 +15,7 @@ RUN apt-get update \
   && apt-get -y autoremove
 
 #bring in DOI root cert.  Remove this statement for non-USGS persons
-RUN /usr/bin/wget -O /usr/lib/ssl/certs/DOIRootCA.crt http://sslhelp.doi.net/docs/DOIRootCA2.cer && \
+RUN /usr/bin/wget -O /usr/lib/ssl/certs/DOIRootCA.crt https://owi-common-resources.s3-us-west-2.amazonaws.com/resources/InstallFiles/SSL/DOIRootCA.cer && \
   ln -sf /usr/lib/ssl/certs/DOIRootCA.crt /usr/lib/ssl/certs/`openssl x509 -hash -noout -in /usr/lib/ssl/certs/DOIRootCA.crt`.0 && \
   echo "\\n\\nca-certificate = /usr/lib/ssl/certs/DOIRootCA.crt" >> /etc/wgetrc; 
 
