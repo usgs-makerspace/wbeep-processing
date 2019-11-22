@@ -4,7 +4,7 @@ library(lwgeom)
 proj_string <- 4326
 
 gfdb <- "cache/GF_nat_reg.gdb"
-hru_reduced <- read_sf(gfdb, "nhru")  %>% 
+hru_reduced <- read_sf(gfdb, "nhruNationalIdentifier")  %>% 
   dplyr::select(Shape, hru_id_nat) %>% 
   st_transform(crs = proj_string) %>% 
   dplyr::mutate(hru_id_2 = hru_id_nat) #need ID in two places in final output
@@ -25,5 +25,12 @@ stopCluster(cl)
 hru_reduced$Shape <- hru_valid_shapes
 #Too big an object to write to geojson directly, since 
 #R tries to serialize it all in memory — have to use ogr2ogr
-write_sf(hru_reduced, 'hru_reduced_valid.shp')
 
+#read in coterminous US layer to clip with
+us <- st_read(dsn="coterminousClip.shp") %>% 
+  st_transform(crs = proj_string)
+
+#clip the hru file to coterminous USA
+hru_cropped <- st_crop(hru_valid_shapes, us)
+
+write_sf(hru_cropped, 'hru_reduced_valid.shp')
