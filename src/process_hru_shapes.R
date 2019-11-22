@@ -4,7 +4,7 @@ library(lwgeom)
 proj_string <- 4326
 
 gfdb <- "cache/GF_nat_reg.gdb"
-hru_reduced <- read_sf(gfdb, "nhruNationalIdentifier")  %>% 
+hru_reduced <- read_sf(gfdb, "nhru")  %>% 
   dplyr::select(Shape, hru_id_nat) %>% 
   st_transform(crs = proj_string) %>% 
   dplyr::mutate(hru_id_2 = hru_id_nat) #need ID in two places in final output
