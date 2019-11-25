@@ -2,6 +2,7 @@
 # process_quantiles_by_hru.R into one file and push to S3.
 
 library(data.table)
+source("src/validate_historic_quantile_data.R") # load code to test model data
 
 files_to_combine <- list.files(path = "grouped_quantiles", 
                                pattern = "total_storage_quantiles",
@@ -23,6 +24,11 @@ combined_data[, "100%" := Inf]
 setcolorder(combined_data, c("hruid", "DOY", "0%",
                              original_quantiles,
                              "100%"))
+
+# Validate that outgoing quantiles are as expected
+message("Started tests for validating calcalated quantiles")
+validate_historic_quantile_data(combined_data)
+message("Completed tests for validating calcalated quantiles")
 
 message("Save quantiles `as all_quantiles.rds`")
 saveRDS(combined_data, "all_quantiles.rds")
