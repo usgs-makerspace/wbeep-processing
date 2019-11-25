@@ -37,6 +37,16 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
   # Max of total storage in all of historic data for all HRUs is ~5,000 mm
   # Considering 300 mm is about 1 ft of water
   # An absolute max for order of magnitude check of 10,000 mm seems appropriate
-  assert_that(all(data_nc < 10000))
+  data_is_good <- all(data_nc < 10000)
+  if(data_is_good) {
+    # Write out a text file that won't have Jenkins send an email.
+    writeLines("NULL", "order_of_magnitude_test.txt")
+  } else {
+    # Write out a text file that will eventually cause the Jenkins file to send an email
+    bad_data_hruids <- hruids[which(data_nc >= 10000)]
+    writeLines(text = sprintf("The following HRUIDs have data >= 10,000: %s", 
+                              paste(bad_data_hruids, collapse = ", ")), 
+               con = "order_of_magnitude_test.txt")
+  }
   
 }

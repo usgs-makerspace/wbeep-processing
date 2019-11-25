@@ -104,5 +104,17 @@ pipeline {
             subject: "Changes: ${currentBuild.fullDisplayName}",
             body: "Pipeline detected changes ${env.BUILD_URL}"
         }
+        always {
+            FILE_TXT=$(cat order_of_magnitude_test.txt)
+            FILE_NCHAR=${#FILE_TXT}
+            if(($FILE_NCHAR>10))
+            then
+              mail to: 'lplatt@usgs.gov',
+                   subject: "Suspicious data: this build",
+                   body: "Pipeline finished, but had suspicious data -- ${FILE_TXT}"
+            else
+              echo "Data passed validation checks."
+            fi
+        }
     }  
 }
