@@ -9,6 +9,7 @@ pipeline {
                      type: 'PT_BRANCH_TAG',
                      defaultValue: 'master'
         choice(choices: ['test', 'qa', 'beta', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+        choice(choices: ['yes', 'no'], description: 'Run validation script or not', name: 'VALIDATE_DATA')
   }
   stages {
     stage('Clean Workspace') {
@@ -56,7 +57,7 @@ pipeline {
           PATTERN="*.nc"
           FILES=($PATTERN)
           DATE="${FILES:0:10}"
-          Rscript src/process_model_output.R "${DATE}"
+          Rscript src/process_model_output.R "${DATE}" "${params.VALIDATE_DATA}"
           '''
       }
     }
