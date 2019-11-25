@@ -34,7 +34,7 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
   assert_that(dim(data_nc) == n_hrus) 
   
   # General order of magnitude test
-  # Max of total storage in all of historic data for all HRUs is ~5,000 mm
+  # Max of total storage in all of historic data for all HRUs is ~8,000 mm
   # Considering 300 mm is about 1 ft of water
   # An absolute max for order of magnitude check of 10,000 mm seems appropriate
   data_is_good <- all(data_nc < 10000)
