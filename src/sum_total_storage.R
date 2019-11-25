@@ -15,10 +15,10 @@ start_of_loop <- Sys.time()
 
 vars <- c(
   "soil_moist_tot",
-  #"pkwater_equiv",
+  "pkwater_equiv",
   "hru_intcpstor", 
-  #"hru_impervstor", 
-  #"gwres_stor", 
+  "hru_impervstor", 
+  "gwres_stor", 
   "dprst_stor_hru"
 )
 
