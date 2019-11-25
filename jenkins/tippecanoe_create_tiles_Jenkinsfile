@@ -18,7 +18,6 @@ pipeline {
 	  }
     stage('Checkout repo and pull from S3') {
       steps {
-        sh 'wget -O DOIRootCA2.cer http://sslhelp.doi.net/docs/DOIRootCA2.cer'
          checkout([$class: 'GitSCM',
                           branches: [[name: "${params.BRANCH_TAG}"]],
                           doGenerateSubmoduleConfigurations: false,
@@ -42,7 +41,7 @@ pipeline {
       }
       steps {
         sh '''
-          tippecanoe -zg --no-feature-limit --no-tile-size-limit --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory tile_dir_simple5 hrus.geojson
+          tippecanoe -z6 --no-feature-limit --no-tile-size-limit --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory tile_dir_simple5 hrus.geojson
           '''
       }
     }
