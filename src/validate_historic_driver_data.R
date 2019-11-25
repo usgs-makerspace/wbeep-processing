@@ -10,7 +10,7 @@ validate_historic_driver_data <- function(var, fn, data_nc, hruids, time, time_f
   # Get a bit more detailed metadata
   meta_info <- nc_meta(fn)
   atts_var_i <- which(meta_info$attribute$variable == var)
-  atts_units_i <- which(meta_info$attribute$name == "units")
+  atts_units_i <- which(meta_info$attribute$attribute == "units")
   var_unit_i <- atts_units_i[atts_units_i %in% atts_var_i]
   
   assert_that(meta_info$dimension$name[1] == "hruid")
