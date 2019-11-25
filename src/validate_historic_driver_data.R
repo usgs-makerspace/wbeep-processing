@@ -40,6 +40,12 @@ validate_historic_driver_data <- function(var, fn, data_nc, hruids, time, time_f
   # An absolute max for order of magnitude check of 10,000 mm seems appropriate
   assert_that(max(data_nc) < 10000)
   
+  # The validation step for order of magnitude for the daily model output has this step
+  # but it will send an email (NOT FAIL) if this condition is not met. For the purposes
+  # of calculating the historic percentiles, we will have this step fail if it is not met. 
+  # The historic percentile calculation is more hands on and people should investigate this
+  # issue immediately before proceeding.
+  
 }
 
 validate_historic_data_times_match <- function(date_list, vars) {
