@@ -26,4 +26,4 @@ hru_reduced$Shape <- hru_valid_shapes
 #Too big an object to write to geojson directly, since 
 #R tries to serialize it all in memory — have to use ogr2ogr
 
-write_sf(hru_cropped, 'hru_reduced_valid.shp')
+write_sf(hru_valid_shapes, 'hru_reduced_valid.shp')
