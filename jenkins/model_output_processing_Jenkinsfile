@@ -110,7 +110,7 @@ pipeline {
             if(($FILE_NCHAR>10))
             then
               mail to: 'lplatt@usgs.gov',
-                   subject: "Suspicious data: this build",
+                   subject: "Suspicious data: ${currentBuild.fullDisplayName}",
                    body: "Pipeline finished, but had suspicious data -- ${FILE_TXT}"
             else
               echo "Data passed validation checks."
