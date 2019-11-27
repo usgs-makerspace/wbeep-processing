@@ -105,6 +105,7 @@ pipeline {
             body: "Pipeline detected changes ${env.BUILD_URL}"
         }
         always {
+          steps {
             if ((new File(order_of_magnitude_test.txt).length()) > 10) {
 	            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
 		          subject: "Suspicious data: ${currentBuild.fullDisplayName}",
@@ -113,6 +114,7 @@ pipeline {
             } else {
             	println "Data passed validation checks."
             }
+          }
         }
     }  
 }
