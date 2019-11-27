@@ -57,7 +57,7 @@ pipeline {
           PATTERN="*.nc"
           FILES=($PATTERN)
           DATE="${FILES:0:10}"
-          Rscript src/process_model_output.R "${DATE}" "${params.VALIDATE_DATA}"
+          Rscript src/process_model_output.R "${DATE}" "${VALIDATE_DATA}"
           '''
       }
     }
@@ -106,14 +106,19 @@ pipeline {
         }
         always {
           script {
-            if ((new File("order_of_magnitude_test.txt").length()) > 10) {
-	            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
-		               subject: "Suspicious data: ${currentBuild.fullDisplayName}",
-		               body: "Pipeline finished, but had suspicious data -- see file attached."
-		          attachmentsPattern: 'order_of_magnitude_test.txt'
-		          println "Data failed validation checks. An email was sent."
+            File file = new File("order_of_magnitude_test.txt")
+            if (file.exists()) {
+              if ((file.length()) > 10) {
+  	            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
+  		               subject: "Suspicious data: ${currentBuild.fullDisplayName}",
+  		               body: "Pipeline finished, but had suspicious data -- see file attached."
+  		          attachmentsPattern: 'order_of_magnitude_test.txt'
+  		          println "Data failed validation checks. An email was sent."
+              } else {
+              	println "Data passed validation checks."
+              }
             } else {
-            	println "Data passed validation checks."
+              println "Data validation skipped."
             }
           }
         }
