@@ -105,16 +105,14 @@ pipeline {
             body: "Pipeline detected changes ${env.BUILD_URL}"
         }
         always {
-            FILE_TXT=$(cat order_of_magnitude_test.txt)
-            FILE_NCHAR=${#FILE_TXT}
-            if(($FILE_NCHAR>10))
-            then
-              mail to: 'lplatt@usgs.gov',
-                   subject: "Suspicious data: ${currentBuild.fullDisplayName}",
-                   body: "Pipeline finished, but had suspicious data -- ${FILE_TXT}"
-            else
-              echo "Data passed validation checks."
-            fi
+            if ((new File(order_of_magnitude_test.txt).length()) > 10) {
+	            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
+		          subject: "Suspicious data: ${currentBuild.fullDisplayName}",
+		          body: "Pipeline finished, but had suspicious data -- see file attached."
+		          attachmentsPattern: 'order_of_magnitude_test.txt'
+            } else {
+            	println "Data passed validation checks."
+            }
         }
     }  
 }
