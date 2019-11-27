@@ -11,6 +11,11 @@ pipeline {
         choice(choices: ['test', 'qa', 'beta', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
   }
   stages {
+    stage('Clean Workspace') {
+      steps{
+        cleanWs()
+      }
+    }
     stage('Checkout repo and pull from S3') {
       steps {
         checkout([$class: 'GitSCM',
