@@ -57,7 +57,7 @@ pipeline {
           PATTERN="*.nc"
           FILES=($PATTERN)
           DATE="${FILES:0:10}"
-          Rscript src/process_model_output.R "${DATE}" "${params.VALIDATE_DATA}"
+          Rscript src/process_model_output.R "${DATE}" "${VALIDATE_DATA}"
           '''
       }
     }
