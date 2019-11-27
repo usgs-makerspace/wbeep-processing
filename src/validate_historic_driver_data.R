@@ -9,9 +9,6 @@ validate_historic_driver_data <- function(var, fn, data_nc, hruids, time, time_f
   
   # Get a bit more detailed metadata
   meta_info <- nc_meta(fn)
-  atts_var_i <- which(meta_info$attribute$variable == var)
-  atts_units_i <- which(meta_info$attribute$attribute == "units")
-  var_unit_i <- atts_units_i[atts_units_i %in% atts_var_i]
   
   assert_that(meta_info$dimension$name[1] == "hruid")
   assert_that(meta_info$dimension$name[2] == "time")
@@ -19,7 +16,8 @@ validate_historic_driver_data <- function(var, fn, data_nc, hruids, time, time_f
   assert_that(meta_info$dimension$length[2] == n_days) # Expect a specific number of days
   
   # Test unit for variable
-  assert_that(meta_info$attribute$value[[var_unit_i]] == "mm") # Expect millimeters
+  units_att_list <- nc_att(fn, var, "units")[["value"]]
+  assert_that(unlist(units_att_list) == "mm") # Expect millimeters
   
   ##### Test: NetCDF hruids are in expected order and the expected data type #####
   assert_that(is.integer(hruids))
