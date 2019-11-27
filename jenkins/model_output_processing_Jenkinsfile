@@ -106,13 +106,16 @@ pipeline {
         }
         always {
           steps {
-            if ((new File(order_of_magnitude_test.txt).length()) > 10) {
-	            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
-		          subject: "Suspicious data: ${currentBuild.fullDisplayName}",
-		          body: "Pipeline finished, but had suspicious data -- see file attached."
-		          attachmentsPattern: 'order_of_magnitude_test.txt'
-            } else {
-            	println "Data passed validation checks."
+            script {
+              if ((new File(order_of_magnitude_test.txt).length()) > 10) {
+  	            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
+  		               subject: "Suspicious data: ${currentBuild.fullDisplayName}",
+  		               body: "Pipeline finished, but had suspicious data -- see file attached."
+  		          attachmentsPattern: 'order_of_magnitude_test.txt'
+  		          echo "Data failed validation checks. An email was sent."
+              } else {
+              	echo "Data passed validation checks."
+              }
             }
           }
         }
