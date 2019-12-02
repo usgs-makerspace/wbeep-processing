@@ -41,7 +41,7 @@ pipeline {
       }
       steps {
         sh '''
-          tippecanoe -z0 -Z6 --no-feature-limit --no-tile-size-limit --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory tile_dir_simple5 hrus.geojson
+          tippecanoe -z6 -Z0 --no-feature-limit --no-tile-size-limit --no-tiny-polygon-reduction --detect-shared-borders --simplify-only-low-zooms --simplification=5 --force --output-to-directory tile_dir_simple5 hrus.geojson
           '''
       }
     }
