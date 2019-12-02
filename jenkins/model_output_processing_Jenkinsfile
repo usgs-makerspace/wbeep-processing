@@ -104,7 +104,7 @@ pipeline {
             subject: "Changes: ${currentBuild.fullDisplayName}",
             body: "Pipeline detected changes ${env.BUILD_URL}"
         }
-        always {
+        cleanup {
           script {
             File file = new File("order_of_magnitude_test.txt")
             if (file.exists()) {
