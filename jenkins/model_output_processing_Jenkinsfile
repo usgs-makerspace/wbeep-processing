@@ -110,13 +110,13 @@ pipeline {
             dh.eachFile {
                 println(it)
             }
-            File file = new File("order_of_magnitude_test.txt")
+            File file = new File("../order_of_magnitude_test.txt")
             if (file.exists()) {
               if ((file.length()) > 200) {
   	            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
   		               subject: "Suspicious data: ${currentBuild.fullDisplayName}",
   		               body: "Pipeline finished, but had suspicious data -- see file attached."
-  		          attachmentsPattern: 'order_of_magnitude_test.txt'
+  		          attachmentsPattern: '../order_of_magnitude_test.txt'
   		          println "Data failed validation checks. An email was sent."
               } else {
               	println "Data passed validation checks."
