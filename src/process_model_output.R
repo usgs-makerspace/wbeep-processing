@@ -4,7 +4,7 @@ library(ncdf4)
 library(dplyr)
 
 args <- commandArgs(trailingOnly=TRUE)
-today <- args[1] #today <- "2019-07-31"
+today <- args[1] #today <- "2019-10-31"
 validate_data <- args[2] == "yes" # defaults to 'yes'
 
 source("src/validate_oNHM_daily_output.R") # load code to test model data
