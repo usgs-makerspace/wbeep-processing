@@ -110,7 +110,7 @@ pipeline {
             dh.eachFile {
                 println(it)
             }
-            File file = new File("order_of_magnitude_test.txt")
+            File file = new File("../order_of_magnitude_test.txt")
             if (file.exists()) {
               if ((file.length()) > 200) {
   	            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
