@@ -106,6 +106,10 @@ pipeline {
         }
         cleanup {
           script {
+            dh = new File('.')
+            dh.eachFile {
+                println(it)
+            }
             File file = new File("order_of_magnitude_test.txt")
             if (file.exists()) {
               if ((file.length()) > 200) {
