@@ -84,23 +84,25 @@ pipeline {
     }
     stage('Execute data validation steps') {
       steps {
-        dh = new File('.')
-        dh.eachFile {
-            println(it)
-        }
-        File file = new File("order_of_magnitude_test.txt")
-        if (file.exists()) {
-          if ((file.length()) > 200) {
-            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
-                 subject: "Suspicious data: ${currentBuild.fullDisplayName}",
-                 body: "Pipeline finished, but had suspicious data -- see file attached."
-            attachmentsPattern: 'order_of_magnitude_test.txt'
-            println "Data failed validation checks. An email was sent."
-          } else {
-          	println "Data passed validation checks."
+        script {
+          dh = new File('.')
+          dh.eachFile {
+              println(it)
           }
-        } else {
-          println "Data validation skipped."
+          File file = new File("order_of_magnitude_test.txt")
+          if (file.exists()) {
+            if ((file.length()) > 200) {
+              mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
+                   subject: "Suspicious data: ${currentBuild.fullDisplayName}",
+                   body: "Pipeline finished, but had suspicious data -- see file attached."
+              attachmentsPattern: 'order_of_magnitude_test.txt'
+              println "Data failed validation checks. An email was sent."
+            } else {
+            	println "Data passed validation checks."
+            }
+          } else {
+            println "Data validation skipped."
+          }
         }
       }
     }
