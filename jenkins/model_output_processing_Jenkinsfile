@@ -75,10 +75,10 @@ pipeline {
         script {
           def files = findFiles(glob: 'order_of_magnitude_test.txt')
           if (files) {
-            if (files[0].length > 10) {
+            if (files[0].length > 200) {
               mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
                    subject: "Suspicious data: ${currentBuild.fullDisplayName}",
-                   body: "Pipeline finished, but had suspicious data -- see ${files[0]} file in the job workspace for details."
+                   body: "Pipeline finished, but had suspicious data. See -- ${files[0]} -- in the job workspace for details."
               println "Data failed validation checks. An email was sent."
             } else {
             	println "Data passed validation checks."
