@@ -78,10 +78,10 @@ pipeline {
             if (files[0].length > 10) {
               mail to: 'lplatt@usgs.gov',
                    subject: "Suspicious data: ${currentBuild.fullDisplayName}",
-                   body: "Pipeline finished, but had suspicious data -- see file attached."
-              attachmentsPattern: '${files[0].path}/${files[0].name}'
+                   body: "Pipeline finished, but had suspicious data -- see file attached.",
+                   attachmentsPattern: '**/${files[0]}'
               println "Data failed validation checks. An email was sent."
-              println "${files[0]}--${files[0].path}--${files[0].name}"
+              println files[0].text
             } else {
             	println "Data passed validation checks."
             }
