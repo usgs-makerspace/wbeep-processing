@@ -79,7 +79,7 @@ pipeline {
               mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
                    subject: "Suspicious data: ${currentBuild.fullDisplayName}",
                    body: "Pipeline finished, but had suspicious data -- see file attached."
-              attachmentsPattern: 'files[0]'
+              attachmentsPattern: '${files[0].path}/${files[0].name}'
               println "Data failed validation checks. An email was sent."
             } else {
             	println "Data passed validation checks."
