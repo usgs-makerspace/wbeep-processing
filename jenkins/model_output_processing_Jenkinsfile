@@ -61,7 +61,7 @@ pipeline {
           '''
       }
     }
-    stage('push to S3') {
+    stage('push to S3 & check validation tests') {
       steps { 
         sh ''' 
           PATTERN="*.nc"
@@ -72,18 +72,6 @@ pipeline {
           echo ${DATE} > date.txt
           aws s3 cp date.txt s3://prod-owi-resources/resources/Application/wbeep/${TIER}/date.txt
         '''
-      }
-    }
-    stage('build downstream job') {
-      steps { 
-        sh "echo ${params.BRANCH_TAG}"
-        build job: 'tippecanoe_tile_join', 
-              parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
-              string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
-      }
-    }
-    stage('Execute data validation steps') {
-      steps {
         script {
           dh = new File('.')
           dh.eachFile {
@@ -104,6 +92,14 @@ pipeline {
             println "Data validation skipped."
           }
         }
+      }
+    }
+    stage('build downstream job') {
+      steps { 
+        sh "echo ${params.BRANCH_TAG}"
+        build job: 'tippecanoe_tile_join', 
+              parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
+              string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
       }
     }
   }
