@@ -9,6 +9,7 @@ pipeline {
                      type: 'PT_BRANCH_TAG',
                      defaultValue: 'master'
         choice(choices: ['test', 'qa', 'beta', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+        choice(choices: ['yes', 'no'], description: 'Run validation script or not', name: 'VALIDATE_DATA')
   }
   stages {
     stage('Clean Workspace') {
@@ -56,11 +57,11 @@ pipeline {
           PATTERN="*.nc"
           FILES=($PATTERN)
           DATE="${FILES:0:10}"
-          Rscript src/process_model_output.R "${DATE}"
+          Rscript src/process_model_output.R "${DATE}" "${VALIDATE_DATA}"
           '''
       }
     }
-    stage('push to S3') {
+    stage('push to S3 & check validation tests') {
       steps { 
         sh ''' 
           PATTERN="*.nc"
@@ -71,6 +72,21 @@ pipeline {
           echo ${DATE} > date.txt
           aws s3 cp date.txt s3://prod-owi-resources/resources/Application/wbeep/${TIER}/date.txt
         '''
+        script {
+          def files = findFiles(glob: 'order_of_magnitude_test.txt')
+          if (files) {
+            if (files[0].length > 200) {
+              mail to: 'mhines@usgs.gov, wwatkins@usgs.gov, lplatt@usgs.gov',
+                   subject: "Suspicious data: ${currentBuild.fullDisplayName}",
+                   body: "Pipeline finished, but had suspicious data. See -- ${files[0]} -- in the job workspace for details."
+              println "Data failed validation checks. An email was sent."
+            } else {
+            	println "Data passed validation checks."
+            }
+          } else {
+            println "Data validation skipped."
+          }
+        }
       }
     }
     stage('build downstream job') {

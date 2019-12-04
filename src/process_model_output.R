@@ -4,7 +4,15 @@ library(ncdf4)
 library(dplyr)
 
 args <- commandArgs(trailingOnly=TRUE)
-today <- args[1] #today <- "2019-07-31"
+today <- args[1] #today <- "2019-10-31"
+validate_data <- args[2] == "yes" # defaults to 'yes'
+
+# Remove the file if it exists in the workspace before checks begin
+#   to avoid any contamination from older jobs
+validate_fn <- "order_of_magnitude_test.txt"
+if(validate_data & file.exists(validate_fn)) {
+  file.remove(validate_fn)
+}
 
 source("src/validate_oNHM_daily_output.R") # load code to test model data
 source("src/validate_total_storage_categorized.R") # load code to test output of this categorization
@@ -28,9 +36,11 @@ var_data_list <- lapply(vars, function(var) {
   today_data_nc <- ncvar_get(nc, var, start = c(1,today_dim), count = c(-1, 1))
 
   # Run tests before returning any data
-  message(sprintf("Started tests for %s", var))
-  validate_oNHM_daily_output(var, fn, today, today_data_nc, hruids, time, time_fixed)
-  message(sprintf("Completed tests for %s", var))
+  if(validate_data) {
+    message(sprintf("Started tests for %s", var))
+    validate_oNHM_daily_output(var, fn, today, today_data_nc, hruids, time, time_fixed, validate_fn)
+    message(sprintf("Completed tests for %s", var))
+  }
   
   today_var_data <- data.frame(
     hruid = as.numeric(hruids),
@@ -105,8 +115,10 @@ values_categorized <- total_storage_data %>%
                                      `0%`, `10%`, `25%`, `75%`, `90%`, `100%`)) %>%
   rename(hru_id_nat = hruid)
 
-message("Started tests for validating categorized output")
-validate_total_storage_categorized(values_categorized)
-message("Completed tests for validating categorized output")
+if(validate_data) {
+  message("Started tests for validating categorized output")
+  validate_total_storage_categorized(values_categorized)
+  message("Completed tests for validating categorized output")
+}
 
 readr::write_csv(values_categorized, "model_output_categorized.csv")
