@@ -1,7 +1,8 @@
 library(assertthat)
 library(ncmeta)
 
-validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time, time_fixed, n_hrus = 109951) {
+validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time, 
+                                       time_fixed, validate_fn, n_hrus = 109951) {
   
   ##### Test: NetCDF dimensions and variables are as expected #####
   
@@ -41,7 +42,7 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
     # Write out a text file that won't have Jenkins send an email.
     # Add information about the current var to the file.
     write(x = sprintf("%s data: NULL", var), 
-          file = "order_of_magnitude_test.txt",
+          file = validate_fn,
           append = TRUE)
   } else {
     message("DATA = BAD")
@@ -50,7 +51,7 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
     bad_data_hruids <- hruids[which(data_nc >= 10000)]
     write(x = sprintf("The following HRUIDs have %s data >= 10,000: %s", 
                       var, paste(bad_data_hruids, collapse = ", ")), 
-          file = "order_of_magnitude_test.txt",
+          file = validate_fn,
           append = TRUE)
   }
   
