@@ -39,6 +39,7 @@ pipeline {
 		expression { params.TIER == 'prod' }	
 	  }
 	  steps {
+		echo "Inside the retry block"
 		retry(3)
 	  }
       agent {
