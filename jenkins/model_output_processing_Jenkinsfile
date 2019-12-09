@@ -3,6 +3,9 @@ pipeline {
         node {
             label 'team:makerspace'
         }
+        options {
+            retry(3)
+        }
     }
   parameters {
         gitParameter name: 'BRANCH_TAG',
@@ -101,22 +104,22 @@ pipeline {
     post {
         success {
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
-            subject: "Success: ${currentBuild.fullDisplayName}",
+            subject: "${TIER} Success: ${currentBuild.fullDisplayName}",
             body: "Pipeline finished successfully ${env.BUILD_URL}"
         }
         unstable {
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
-            subject: "Unstable: ${currentBuild.fullDisplayName}",
+            subject: "${TIER} Unstable: ${currentBuild.fullDisplayName}",
             body: "Pipeline is unstable ${env.BUILD_URL}"
         }
         failure {
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
-            subject: "Failure: ${currentBuild.fullDisplayName}",
+            subject: "${TIER} Failure: ${currentBuild.fullDisplayName}",
             body: "Pipeline failed ${env.BUILD_URL}"
         }
         changed {
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
-            subject: "Changes: ${currentBuild.fullDisplayName}",
+            subject: "${TIER} Changes: ${currentBuild.fullDisplayName}",
             body: "Pipeline detected changes ${env.BUILD_URL}"
         }
     }  
