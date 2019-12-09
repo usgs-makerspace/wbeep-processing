@@ -35,6 +35,12 @@ pipeline {
       }
     }
     stage('create tileset') {
+	  when {
+		expression { params.TIER == 'prod' }	
+	  }
+	  steps {
+		retry(3)
+	  }
       agent {
         docker {
           image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest'
