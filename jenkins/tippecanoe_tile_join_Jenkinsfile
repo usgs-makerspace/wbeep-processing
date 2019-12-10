@@ -38,7 +38,7 @@ pipeline {
       agent {
         docker {
           image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest'
-          registryUrl 'https://codes.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing'
+          registryUrl 'https://code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing'
           registryCredentialsId 'jenkins_ci_access_token'
           alwaysPull true
           reuseNode true
@@ -48,15 +48,6 @@ pipeline {
         sh 'tile-join --force -pk --output-to-directory tiles -j \'{"hrus": ["<", "hru_id_nat", 109952]}\' -x DOY -x total_storage_today -x 0% -x 5% -x 10% -x 15% -x 20% -x 25% -x 30% -x 35% -x 40% -x 45% -x 50% -x 55% -x 60% -x 65% -x 70% -x 75% -x 80% -x 85% -x 90% -x 95% -x 100% -c model_output_categorized.csv tile_dir_simple5'
         sh 'tile-join --force -pk --output-to-directory tilesFinal -j \'{"hrus": ["!=", "value", "Undefined"]}\' tiles'
       }
-	  post {
-		failure {
-		  script {
-			if (${TIER}=='prod') {
-				retry(1)
-			}
-		  }
-		}
-	  }
     }
     stage('push to S3') {
       steps { 
