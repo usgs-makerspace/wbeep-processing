@@ -20,7 +20,7 @@ pipeline {
       steps {
         sh 'env'
         checkout([$class: 'GitSCM',
-                          branches: [[name: "${params.BRANCH_TAG}"]],
+                          branches: [[name: "${env.GIT_BRANCH}"]],
                           doGenerateSubmoduleConfigurations: false,
                           extensions: [],
                           gitTool: 'Default',
