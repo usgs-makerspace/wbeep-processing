@@ -19,7 +19,7 @@ pipeline {
     stage('Checkout repo and pull from S3') {
       steps {
          checkout([$class: 'GitSCM',
-                          branches: [[name: "${env.GIT_BRANCH}"]],
+                          branches: [[name: "${params.BRANCH_TAG}"]],
                           doGenerateSubmoduleConfigurations: false,
                           extensions: [],
                           gitTool: 'Default',
@@ -52,10 +52,10 @@ pipeline {
     }
     stage('build downstream job') {
       steps { 
-        sh "echo ${env.GIT_BRANCH}"
+        sh "echo ${params.BRANCH_TAG}"
         build job: 'process_model_output', 
               parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
-              string(name: 'BRANCH_TAG', value: "${env.GIT_BRANCH}")]
+              string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
       }
     }
   }
