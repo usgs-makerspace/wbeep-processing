@@ -91,10 +91,10 @@ pipeline {
     }
     stage('build downstream job') {
       steps { 
-        sh "echo ${env.GIT_BRANCH}"
+        sh "echo ${params.BRANCH_TAG}"
         build job: 'tippecanoe_tile_join', 
               parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
-              string(name: 'BRANCH_TAG', value: env.GIT_BRANCH)]
+              string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
       }
     }
   }
