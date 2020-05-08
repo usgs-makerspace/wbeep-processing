@@ -24,7 +24,7 @@ pipeline {
                           extensions: [],
                           gitTool: 'Default',
                           submoduleCfg: [],
-                          userRemoteConfigs: [[url: 'https://github.com/mhines-usgs/wbeep-processing']]
+                          userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
                         ])
         sh 'aws s3 cp s3://prod-owi-resources/resources/Application/wbeep/${TIER}/segsAllConus/ cache/ --recursive'
       }
