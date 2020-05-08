@@ -1,0 +1,59 @@
+pipeline {
+  agent {
+        node {
+            label 'team:makerspace'
+        }
+    }
+  parameters {
+        gitParameter name: 'BRANCH_TAG',
+                     type: 'PT_BRANCH_TAG',
+                     defaultValue: 'master'
+        choice(choices: ['test', 'qa', 'beta', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+  }
+  stages {
+	stage('Clean Workspace') {
+	  steps{
+		cleanWs()
+	  }
+	}
+    stage('Checkout repo and pull from S3') {
+      steps {
+        sh 'env'
+        checkout([$class: 'GitSCM',
+                          branches: [[name: "${env.GIT_BRANCH}"]],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [],
+                          gitTool: 'Default',
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[url: 'https://github.com/mhines-usgs/wbeep-processing']]
+                        ])
+        sh "mkdir ${WORKSPACE}/tilesSegsAllConus"
+        sh "mkdir ${WORKSPACE}/tiles"
+        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/wtr_model_output_csv/ . --exclude "*" --include "stream_temp_2015_10_25.csv"'
+        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/segsAllConus/tilesSegsAllConus ${WORKSPACE}/tilesSegsAllConus'
+      }
+    }
+    stage('create tileset') {
+      agent {
+        docker {
+          image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest'
+          registryUrl 'https://code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing'
+          registryCredentialsId 'jenkins_ci_access_token'
+          alwaysPull true
+          reuseNode true
+        } 
+      }
+      steps {
+        sh 'tile-join --force -pk --output-to-directory tiles -c stream_temp_2015_10_25.csv tilesSegsAllConus'
+      }
+    }
+    stage('push to S3') {
+      steps { 
+        script {
+          targetDomain = "s3://wbeep-${TIER}-website"
+        }
+        sh "aws s3 sync tiles ${targetDomain}/waterTemperature/tiles --content-encoding gzip --content-type application/x-protobuf"
+      }
+    }
+  }
+}
