@@ -1,0 +1,55 @@
+pipeline {
+  agent {
+        node {
+            label 'team:makerspace'
+        }
+    }
+    parameters {
+        gitParameter name: 'BRANCH_TAG',
+                     type: 'PT_BRANCH_TAG',
+                     defaultValue: 'master'
+        choice(choices: ['test', 'qa', 'beta', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+  }
+  stages {
+    stage('Clean Workspace') {
+      steps{
+        cleanWs()
+      }
+    }
+    stage('Checkout repo and pull from S3') {
+      steps {
+        checkout([$class: 'GitSCM',
+                          branches: [[name: "${params.BRANCH_TAG}"]],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [],
+                          gitTool: 'Default',
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
+                        ])
+        sh 'aws s3 cp s3://prod-owi-resources/resources/Application/wbeep/${TIER}/segsAllConus/ cache/ --recursive'
+      }
+    }
+    stage('convert shapefile to geojson') {
+      agent {
+        docker {
+          image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:R-latest'
+          registryUrl 'https://code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing'
+          registryCredentialsId 'jenkins_ci_access_token'
+          alwaysPull true
+          reuseNode true
+        } 
+      }
+      steps {
+        sh 'Rscript -e "source(\'src/process_segsAllConus.R\')"'
+        sh 'ogr2ogr -f GeoJSON segsAllConus.geojson segsAllConus4326.shp'
+      }
+    }
+    stage('push to S3') {
+      steps { 
+        sh '''
+          aws s3 cp hrus.geojson s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/hrus.geojson --content-type "application/json"
+          '''
+      }
+    }
+  }
+}
