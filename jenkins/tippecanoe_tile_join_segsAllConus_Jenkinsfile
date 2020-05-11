@@ -18,16 +18,15 @@ pipeline {
 	}
     stage('Checkout repo and pull from S3') {
       steps {
-        sh '''
-			env
-			checkout([$class: 'GitSCM',
-							  branches: [[name: "${env.GIT_BRANCH}"]],
-							  doGenerateSubmoduleConfigurations: false,
-							  extensions: [],
-							  gitTool: 'Default',
-							  submoduleCfg: [],
-							  userRemoteConfigs: [[url: 'https://github.com/mhines-usgs/wbeep-processing']]
-							])
+        checkout([$class: 'GitSCM',
+						branches: [[name: "${env.GIT_BRANCH}"]],
+						doGenerateSubmoduleConfigurations: false,
+						extensions: [],
+						gitTool: 'Default',
+						submoduleCfg: [],
+						userRemoteConfigs: [[url: 'https://github.com/mhines-usgs/wbeep-processing']]
+		])
+		sh '''
 			mkdir ${WORKSPACE}/tilesSegsAllConus
 			mkdir ${WORKSPACE}/tiles
 			aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/wtr_model_output_csv/ . --exclude "*" --include "stream_temp_2015_10_25.csv"
