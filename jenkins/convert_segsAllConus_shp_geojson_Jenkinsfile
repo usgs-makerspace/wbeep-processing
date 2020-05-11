@@ -26,7 +26,7 @@ pipeline {
                           submoduleCfg: [],
                           userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
                         ])
-        sh 'aws s3 cp --recursive s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/GF_nat_reg.gdb cache/GF_nat_reg.gdb'
+        sh 'aws s3 cp s3://prod-owi-resources/resources/Application/wbeep/${TIER}/segsAllConus/ cache/ --recursive'
       }
     }
     stage('convert shapefile to geojson') {
@@ -40,25 +40,14 @@ pipeline {
         } 
       }
       steps {
-        sh 'Rscript -e "source(\'src/process_hru_shapes.R\')"'
-        sh 'ogr2ogr -f GeoJSON hrus.geojson -lco ID_FIELD=hru_id_2 hru_reduced_valid.shp'
+        sh 'Rscript -e "source(\'src/process_segsAllConus.R\')"'
+        sh 'ogr2ogr -f GeoJSON segsAllConus.geojson segsAllConus4326.shp'
       }
     }
     stage('push to S3') {
       steps { 
-        sh '''
-          aws s3 cp hrus.geojson s3://prod-owi-resources/resources/Application/wbeep/${TIER}/hru_shape/hrus.geojson --content-type "application/json"
-          '''
-      }
-    }
-    stage('build downstream job') {
-      steps { 
-        sh "echo ${params.BRANCH_TAG}"
-        build job: 'tippecanoe_build_tileset', 
-              parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
-              string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
+        sh 'aws s3 cp segsAllConus.geojson s3://prod-owi-resources/resources/Application/wbeep/${TIER}/segsAllConus/segsAllConus.geojson --content-type "application/json"'
       }
     }
   }
 }
-
