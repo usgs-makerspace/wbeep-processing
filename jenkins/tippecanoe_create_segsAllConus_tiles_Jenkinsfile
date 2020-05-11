@@ -1,0 +1,52 @@
+pipeline {
+  agent {
+        node {
+            label 'team:makerspace'
+        }
+    }
+  parameters {
+        gitParameter name: 'BRANCH_TAG',
+                     type: 'PT_BRANCH_TAG',
+                     defaultValue: 'master'
+        choice(choices: ['test', 'qa', 'beta', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+  }
+  stages {
+    stage('Clean Workspace') {
+	    steps{
+		    cleanWs()
+	    }
+	  }
+    stage('Checkout repo and pull from S3') {
+      steps {
+         checkout([$class: 'GitSCM',
+                          branches: [[name: "${params.BRANCH_TAG}"]],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [],
+                          gitTool: 'Default',
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
+                        ])
+        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/segsAllConus . --exclude "*" --include "segsAllConus.geojson"'
+      }
+    }
+    stage('create tileset') {
+      agent {
+        docker {
+          image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest'
+          registryUrl 'https://code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing'
+          registryCredentialsId 'jenkins_ci_access_token'
+          alwaysPull true
+          reuseNode true
+        } 
+      }
+      steps {
+        sh 'tippecanoe -z6 -Z0 --no-simplification-of-shared-nodes --no-feature-limit --no-tile-size-limit '--simplification=5' --output-to-directory tilesSegsAllConus segsAllConus.geojson'
+      }
+    }
+    stage('push to S3') {
+      steps { 
+        sh 'aws s3 sync tilesSegsAllConus s3://prod-owi-resources/resources/Application/wbeep/${TIER}/segsAllConus/tilesSegsAllConus'
+      }
+    }
+  }
+}
