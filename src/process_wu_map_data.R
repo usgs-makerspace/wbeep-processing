@@ -10,10 +10,19 @@
 #   2. Wide format geoJSON with thermoelectric water use values transformed into bubble radii (unique  
 #      spatial features with separate column for each timestep)
 
-# Currently a manual prep process: download, unzip, and move files listed
-#   above to cache before running this code. Eventually, part of a Jenkins
-#   job? Although, these data will not change daily so this process might be 
-#   acceptable long term.
+##### Download and unzip data #####
+# Note 1: you need to be on VPN to access
+# Note 2: this unzipping step doesn't work for lplatt. If it doesn't work,
+#   you may need to manually unzip `HUC12centroid_TE.7z` and make sure those
+#   files are in `cache/` before moving on. 
+
+zip_fn <- "HUC12centroid_TE.7z"
+zip_ftp_path <- file.path("ftp://ftpint.usgs.gov/private/wr/id/boise/Skinner/WU", zip_fn)
+zip_local_path <- file.path("cache", zip_fn)
+download.file(zip_ftp_path, destfile = zip_local_path)
+
+unzip_result <- system(sprintf('7z e -o %s %s', "cache", zip_local_path)) # 
+if(unzip_result == 127) stop("did not actually unzip")
 
 ##### Read in data #####
 
