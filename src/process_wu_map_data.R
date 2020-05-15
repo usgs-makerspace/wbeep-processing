@@ -38,7 +38,8 @@ te_data <- readr::read_csv("cache/HUC12_TE_2015with.csv") %>%
   tidyr::pivot_longer(cols = starts_with("W"), names_to = "Wdate", values_to = "TE_val") %>% 
   mutate(Date = as.Date(gsub("W", "", Wdate), format = "%m-%d-%Y")) %>% 
   filter(!is.na(HUC12)) %>% # There were some entries with NA for the HUC12 code
-  # There are some implausible negative values that need to be changed to zeros
+  # There are some implausible negative values that need to be changed to zeros per
+  # guidance from the WU modeling team on 
   mutate(TE_val = ifelse(TE_val < 0, 0, TE_val))
   
 ##### Transform WU values into bubble radii #####
