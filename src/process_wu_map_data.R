@@ -18,6 +18,7 @@ library(dplyr)
 #   you may need to manually unzip `HUC12centroid_TE.7z` and make sure those
 #   files are in `cache/` before moving on. 
 
+# Download and unzip the water use data
 zip_fn <- "HUC12centroid_TE.7z"
 zip_ftp_path <- file.path("ftp://ftpint.usgs.gov/private/wr/id/boise/Skinner/WU", zip_fn)
 zip_local_path <- file.path("cache", zip_fn)
@@ -26,9 +27,15 @@ download.file(zip_ftp_path, destfile = zip_local_path)
 unzip_result <- system(sprintf('7z e -o %s %s', "cache", zip_local_path)) # 
 if(unzip_result == 127) stop("did not actually unzip")
 
+# Download the new json data (HUCs with centroids in Canada are relocated)
+json_fn <- "HUC12centroid_TEs_pt2.json"
+json_ftp_path <- file.path("ftp://ftpint.usgs.gov/private/wr/id/boise/Skinner/WU", json_fn)
+json_local_path <- file.path("cache", json_fn)
+download.file(json_ftp_path, destfile = json_local_path)
+
 ##### Read in data #####
 
-te_plant_centroids <- geojsonsf::geojson_sf("cache/HUC12centroid_TEs_pt.json") 
+te_plant_centroids <- geojsonsf::geojson_sf(json_local_path) 
 
 te_data <- readr::read_csv("cache/HUC12_TE_2015with.csv") %>% 
   # The `HUC12` column originally had " Total" attached to the end of each code
