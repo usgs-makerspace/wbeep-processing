@@ -10,12 +10,15 @@
 #   2. Wide format geoJSON with thermoelectric water use values transformed into bubble radii (unique  
 #      spatial features with separate column for each timestep)
 
+library(dplyr)
+
 ##### Download and unzip data #####
 # Note 1: you need to be on VPN to access
 # Note 2: this unzipping step doesn't work for lplatt. If it doesn't work,
 #   you may need to manually unzip `HUC12centroid_TE.7z` and make sure those
 #   files are in `cache/` before moving on. 
 
+# Download and unzip the water use data
 zip_fn <- "HUC12centroid_TE.7z"
 zip_ftp_path <- file.path("ftp://ftpint.usgs.gov/private/wr/id/boise/Skinner/WU", zip_fn)
 zip_local_path <- file.path("cache", zip_fn)
@@ -24,24 +27,33 @@ download.file(zip_ftp_path, destfile = zip_local_path)
 unzip_result <- system(sprintf('7z e -o %s %s', "cache", zip_local_path)) # 
 if(unzip_result == 127) stop("did not actually unzip")
 
+# Download the new json data (HUCs with centroids in Canada are relocated)
+json_fn <- "HUC12centroid_TEs_pt2.json"
+json_ftp_path <- file.path("ftp://ftpint.usgs.gov/private/wr/id/boise/Skinner/WU", json_fn)
+json_local_path <- file.path("cache", json_fn)
+download.file(json_ftp_path, destfile = json_local_path)
+
 ##### Read in data #####
 
-te_plant_centroids <- geojsonsf::geojson_sf("cache/HUC12centroid_TEs_pt.json") 
+te_plant_centroids <- geojsonsf::geojson_sf(json_local_path) 
 
 te_data <- readr::read_csv("cache/HUC12_TE_2015with.csv") %>% 
   # The `HUC12` column originally had " Total" attached to the end of each code
   # Remove that and then take the column with only the code (`HUC12t`) and rename to `HUC12`
   select(-HUC12, HUC12 = HUC12t) %>%  
   # Starts in wide format with a column for each day of the year. 
-  tidyr::pivot_longer(cols = starts_with("W"), names_to = "Wdate", values_to = "TE_withdrawal") %>% 
+  tidyr::pivot_longer(cols = starts_with("W"), names_to = "Wdate", values_to = "TE_val") %>% 
   mutate(Date = as.Date(gsub("W", "", Wdate), format = "%m-%d-%Y")) %>% 
-  filter(!is.na(HUC12)) # There were some entries with NA for the HUC12 code
-
+  filter(!is.na(HUC12)) %>% # There were some entries with NA for the HUC12 code
+  # There are some implausible negative values that need to be changed to zeros per
+  # guidance from the WU modeling team on 
+  mutate(TE_val = ifelse(TE_val < 0, 0, TE_val))
+  
 ##### Transform WU values into bubble radii #####
 
 # Calculate the min and max daily thermoelectric values
-te_max <- max(te_data$TE_withdrawal, na.rm = TRUE)
-te_min <- min(te_data$TE_withdrawal, na.rm = TRUE)
+te_max <- max(te_data$TE_val, na.rm = TRUE)
+te_min <- min(te_data$TE_val, na.rm = TRUE)
 
 # Identify the maximum and minimum radii to be used
 bubble_rad_max <- 20
@@ -55,7 +67,7 @@ bubble_area_min <- pi*bubble_rad_min^2
 # Now rescale the water use values using scale of areas that correspond to radii between 0-20
 # Then, calculate the radii
 te_data_transformed <- te_data %>% 
-  mutate(TE_area = ((TE_withdrawal - te_min) * 
+  mutate(TE_area = ((TE_val - te_min) * 
                       (bubble_area_max - bubble_area_min) / 
                       (te_max - te_min)) + bubble_area_min) %>% 
   mutate(TE_radius = sqrt(TE_area/pi))
