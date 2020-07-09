@@ -48,10 +48,7 @@ pipeline {
         } 
       }
       steps {
-        sh '''
-			date=`cat date.txt`
-			tile-join --force -pk --output-to-directory tiles -c stream_temp_${date//-/_}.csv tilesSegsAllConus
-			'''
+        sh 'tile-join --force -pk --output-to-directory tiles -c stream_temp_${date//-/_}.csv tilesSegsAllConus'
       }
     }
     stage('push to S3') {
@@ -64,27 +61,5 @@ pipeline {
 		
       }
     }
-  }
-  post {
-        success {
-            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
-            subject: "${TIER} Success: ${currentBuild.fullDisplayName}",
-            body: "Pipeline finished successfully ${env.BUILD_URL}"
-        }
-        unstable {
-            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
-            subject: "${TIER} Unstable: ${currentBuild.fullDisplayName}",
-            body: "Pipeline is unstable ${env.BUILD_URL}"
-        }
-        failure {
-            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
-            subject: "${TIER} Failure: ${currentBuild.fullDisplayName}",
-            body: "Pipeline failed ${env.BUILD_URL}"
-        }
-        changed {
-            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
-            subject: "${TIER} Changes: ${currentBuild.fullDisplayName}",
-            body: "Pipeline detected changes ${env.BUILD_URL}"
-        }
-    }  
+  } 
 }
