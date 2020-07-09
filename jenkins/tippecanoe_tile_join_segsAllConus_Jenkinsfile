@@ -48,7 +48,7 @@ pipeline {
         } 
       }
       steps {
-	    date=`cat date.txt`
+        date=`cat date.txt`
         sh 'tile-join --force -pk --output-to-directory tiles -c stream_temp_${date//-/_}.csv tilesSegsAllConus'
       }
     }
