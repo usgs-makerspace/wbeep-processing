@@ -48,7 +48,7 @@ pipeline {
         } 
       }
       steps {
-        sh 'tile-join --force -pk --output-to-directory tiles -c stream_temp_2015_10_25.csv tilesSegsAllConus'
+        sh 'tile-join --force -pk --output-to-directory tiles -c stream_temp_${date//-/_}.csv tilesSegsAllConus'
       }
     }
     stage('push to S3') {
