@@ -29,8 +29,10 @@ pipeline {
 		sh '''
 			mkdir ${WORKSPACE}/tilesSegsAllConus
 			mkdir ${WORKSPACE}/tiles
-			aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/wtr_model_output_csv/ . --exclude "*" --include "stream_temp_2015_10_25.csv"
 			aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/waterTemperature/ . --exclude "*" --include "date.txt"
+			date=`cat date.txt`
+			echo "$date"
+			aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/wtr_model_output_csv/ . --exclude "*" --include "stream_temp_${date}.csv"
 			aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/segsAllConus/tilesSegsAllConus ${WORKSPACE}/tilesSegsAllConus
 			'''
       }
