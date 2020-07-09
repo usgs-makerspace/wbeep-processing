@@ -56,10 +56,8 @@ pipeline {
         script {
           targetDomain = "s3://wbeep-${TIER}-website"
         }
-        sh '''
-			aws s3 sync tiles ${targetDomain}/estimated-availability/tiles/waterTemperature/ --content-encoding 'gzip' --content-type 'application/x-protobuf'
-			aws s3 sync date.txt ${targetDomain}/estimated-availability/date/waterTemperature/date.txt --content-encoding 'text/html' --content-type 'text/plain'
-			'''
+        sh "aws s3 sync tiles ${targetDomain}/estimated-availability/tiles/waterTemperature/ --content-encoding gzip --content-type application/x-protobuf"
+		sh "aws s3 sync date.txt ${targetDomain}/estimated-availability/date/waterTemperature/date.txt --content-encoding text/html --content-type text/plain"
 		
       }
     }
