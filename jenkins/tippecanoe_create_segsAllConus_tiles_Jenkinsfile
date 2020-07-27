@@ -40,7 +40,7 @@ pipeline {
         } 
       }
       steps {
-        sh 'tippecanoe -z6 -Z0 --no-simplification-of-shared-nodes --no-feature-limit --no-tile-size-limit --simplification=5 --output-to-directory tilesSegsAllConus segsAllConus.geojson'
+        sh 'tippecanoe -z12 -Z0 --no-simplification-of-shared-nodes --no-feature-limit --no-tile-size-limit --simplification=5 --output-to-directory tilesSegsAllConus segsAllConus.geojson'
       }
     }
     stage('push to S3') {
