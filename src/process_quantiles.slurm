@@ -9,7 +9,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=mhines@usgs.gov
 #SBATCH --export=ALL
-#SBATCH --array=1-110 # 109,951 HRUs / 1000 HRUs per task = 110 tasks
+#SBATCH --array=1-115 # 114958 HRUs / 1000 HRUs per task = 115 tasks
 
 mkdir -p grouped_quantiles
 
