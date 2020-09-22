@@ -27,7 +27,7 @@ task_id_to_hru_seq <- function(task_id, n_hrus_per_task = 1000) {
   hru_id_end <- hru_id_start + (n_hrus_per_task-1) # which hru to end with
   
   # If we are past the last column, cut the final col id off
-  n_hrus <- 109951
+  n_hrus <- 114958
   hru_id_end <- ifelse(hru_id_end > n_hrus,
                        yes = n_hrus,
                        no = hru_id_end)

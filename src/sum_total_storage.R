@@ -8,7 +8,7 @@ library(data.table)
 
 source("src/validate_historic_driver_data.R") # load code to test model data
 
-n_hrus <- 109951
+n_hrus <- 114958
 n_hrus_per_group <- 1000
 
 start_of_loop <- Sys.time()

@@ -1,6 +1,6 @@
 library(assertthat)
 
-validate_historic_quantile_data <- function(quantile_data, n_hrus = 109951, n_days = 365) {
+validate_historic_quantile_data <- function(quantile_data, n_hrus = 114958, n_days = 365) {
   
   # n_days at 365 until leap years are dealt with
   
@@ -23,12 +23,12 @@ validate_historic_quantile_data <- function(quantile_data, n_hrus = 109951, n_da
   
   # We know that one CA HRU doesn't have historic data for quantiles (104388) and will be Undefined
   # This is also true for 7 other HRUs that are not in the U.S.
-  problem_hruids <- c(104388, 46760, 46766, 46767, 82924, 82971, 82983, 82984)
+  #problem_hruids <- c(104388, 46760, 46766, 46767, 82924, 82971, 82983, 82984)
   real_cols <- percentile_cols[!percentile_cols %in% c("0%", "100%")]
-  quantiles_problem_hru <- unlist(quantile_data[quantile_data$hruid %in% problem_hruids, real_cols], use.names=F)
-  quantiles_good_hrus <- unlist(quantile_data[!quantile_data$hruid %in% problem_hruids, real_cols], use.names=F)
-  assert_that(all(quantiles_problem_hru == 0)) # Every quantile will be 0 for these bad HRUs
-  assert_that(any(quantiles_good_hrus > 0)) # There will be some that are greater than zero
+  #quantiles_problem_hru <- unlist(quantile_data[quantile_data$hruid %in% problem_hruids, real_cols], use.names=F)
+  #quantiles_good_hrus <- unlist(quantile_data[!quantile_data$hruid %in% problem_hruids, real_cols], use.names=F)
+  #assert_that(all(quantiles_problem_hru == 0)) # Every quantile will be 0 for these bad HRUs
+  #assert_that(any(quantiles_good_hrus > 0)) # There will be some that are greater than zero
   
   ##### Test: General order of magnitude #####
   
