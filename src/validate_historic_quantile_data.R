@@ -21,21 +21,22 @@ validate_historic_quantile_data <- function(quantile_data, n_hrus = 114958, n_da
   
   ##### Test: HRUs with missing quantile data #####
   
-  # We know that one CA HRU doesn't have historic data for quantiles (104388) and will be Undefined
-  # This is also true for 7 other HRUs that are not in the U.S.
-  #problem_hruids <- c(104388, 46760, 46766, 46767, 82924, 82971, 82983, 82984)
+  # We used to have problem hruids that produced bad quantiles. With the Sep 2020 update,
+  # that no longer seems to be an issue. Leaving this functionality here in case
+  # some do come to light in the future. 
+  problem_hruids <- c() # HRUIDs with bad quantiles as numberic values
   real_cols <- percentile_cols[!percentile_cols %in% c("0%", "100%")]
-  #quantiles_problem_hru <- unlist(quantile_data[quantile_data$hruid %in% problem_hruids, real_cols], use.names=F)
-  #quantiles_good_hrus <- unlist(quantile_data[!quantile_data$hruid %in% problem_hruids, real_cols], use.names=F)
-  #assert_that(all(quantiles_problem_hru == 0)) # Every quantile will be 0 for these bad HRUs
-  #assert_that(any(quantiles_good_hrus > 0)) # There will be some that are greater than zero
+  quantiles_problem_hru <- unlist(quantile_data[quantile_data$hruid %in% problem_hruids, real_cols, with=FALSE], use.names=F)
+  quantiles_good_hrus <- unlist(quantile_data[!quantile_data$hruid %in% problem_hruids, real_cols, with=FALSE], use.names=F)
+  assert_that(all(quantiles_problem_hru == 0)) # Every quantile will be 0 for these bad HRUs
+  assert_that(any(quantiles_good_hrus > 0)) # There will be some that are greater than zero
   
   ##### Test: General order of magnitude #####
   
   # Max of total storage in all of historic total storage data for all HRUs is ~8,000 mm
   # Considering 300 mm is about 1 ft of water (diff between historic max and assumed max is ~ 6.5 ft of water)
   # An absolute max for order of magnitude check of 10,000 mm seems appropriate
-  just_quantile_data <- as.matrix(quantile_data[,real_cols])
+  just_quantile_data <- as.matrix(quantile_data[,real_cols, with=FALSE])
   assert_that(max(just_quantile_data) < 10000) 
   
 }
