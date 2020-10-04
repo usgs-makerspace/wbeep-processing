@@ -76,7 +76,7 @@ pipeline {
       }
     } */
   }
-    post {
+    /*post {
         success {
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Success: ${currentBuild.fullDisplayName}",
@@ -97,5 +97,5 @@ pipeline {
             subject: "${TIER} Changes: ${currentBuild.fullDisplayName}",
             body: "Pipeline detected changes ${env.BUILD_URL}"
         }
-    }  
+    } */ 
 }
