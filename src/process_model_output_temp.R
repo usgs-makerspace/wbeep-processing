@@ -16,4 +16,4 @@ tibble(Date = today,
   #   -99.9 means that the segment never has any flow (determined up in init).
   #   -98.9 means that this a segment that could have flow, but doesn't
   filter(!temp %in% c(-99.9, -98.9)) %>% 
-  write_csv(sprintf("stream_temp_%s.csv", format(as.Date(today), "%Y_%m_%d")))
+  write_csv(sprintf("stream_temp_%s.csv", format(as.Date(today), "%Y-%m-%d")))
