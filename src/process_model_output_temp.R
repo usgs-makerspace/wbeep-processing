@@ -9,8 +9,8 @@ today <- args[1]
 fn <- sprintf("%s_seg_tave_water.nc", today)
 nc <- nc_open(fn)
 
-tibble(Date = today, 
-       nhm_seg = ncvar_get(nc, varid = "segid"),
+tibble(nhm_seg = ncvar_get(nc, varid = "segid"),
+       Date = today,
        temp = ncvar_get(nc, varid = "seg_tave_water")) %>% 
   # PRMS documentation states:
   #   -99.9 means that the segment never has any flow (determined up in init).
