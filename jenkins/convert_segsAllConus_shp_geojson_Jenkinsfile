@@ -49,5 +49,13 @@ pipeline {
         sh 'aws s3 cp segsAllConus.geojson s3://prod-owi-resources/resources/Application/wbeep/${TIER}/segsAllConus/segsAllConus.geojson --content-type "application/json"'
       }
     }
+    stage('build downstream job') {
+      steps { 
+        sh "echo ${params.BRANCH_TAG}"
+        build job: 'tippecanoe_build_segsAllConus_tileset', 
+              parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
+              string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
+      }
+    }
   }
 }
