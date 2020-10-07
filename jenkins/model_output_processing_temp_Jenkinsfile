@@ -67,16 +67,16 @@ pipeline {
         '''
       }
     }
-/*    stage('build downstream job') {
+    stage('build downstream job') {
       steps { 
         sh "echo ${params.BRANCH_TAG}"
         build job: 'tippecanoe_tile_join_segsAllConus_Jenkinsfile', 
               parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
               string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
       }
-    } */
+    }
   }
-    /*post {
+    post {
         success {
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Success: ${currentBuild.fullDisplayName}",
@@ -97,5 +97,5 @@ pipeline {
             subject: "${TIER} Changes: ${currentBuild.fullDisplayName}",
             body: "Pipeline detected changes ${env.BUILD_URL}"
         }
-    } */ 
+    } 
 }
