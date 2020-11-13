@@ -1,0 +1,75 @@
+pipeline {
+  agent {
+        node {
+            label 'team:makerspace'
+        }
+    }
+  parameters {
+        gitParameter name: 'BRANCH_TAG',
+                     type: 'PT_BRANCH_TAG',
+                     defaultValue: 'master'
+        choice(choices: ['test', 'qa', 'beta', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+  }
+  stages {
+    stage('Clean Workspace') {
+	    steps{
+		    cleanWs()
+	    }
+	  }
+    stage('Checkout repo and pull from S3') {
+      steps {
+         checkout([$class: 'GitSCM',
+                          branches: [[name: "${params.BRANCH_TAG}"]],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [],
+                          gitTool: 'Default',
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
+                        ])
+        sh 'aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/greatlakes . --include "Great_Lakes.json"'
+      }
+    }
+    stage('create tileset') {
+      agent {
+        docker {
+          image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:tippecanoe-latest'
+          registryUrl 'https://code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing'
+          registryCredentialsId 'jenkins_ci_access_token'
+          alwaysPull true
+          reuseNode true
+        } 
+      }
+      steps {
+        sh "mkdir ${WORKSPACE}/greatlakes"
+        sh 'tippecanoe -z6 -Z0 --no-simplification-of-shared-nodes --no-feature-limit --no-tile-size-limit --output-to-directory greatlakes Great_Lakes.json'
+      }
+    }
+    stage('push to S3') {
+      steps { 
+        sh 'aws s3 sync greatlakes s3://maptiles-prod-website/greatlakes --content-encoding gzip --content-type application/x-protobuf'
+      }
+    }
+  }
+      post {
+        success {
+            mail to: 'mhines@usgs.gov',
+            subject: "Success: ${currentBuild.fullDisplayName}",
+            body: "Successful build of great lakes tiles ${env.BUILD_URL}"
+        }
+        unstable {
+            mail to: 'mhines@usgs.gov',
+            subject: "Unstable: ${currentBuild.fullDisplayName}",
+            body: "Unstable build of great lakes tiles ${env.BUILD_URL}"
+        }
+        failure {
+            mail to: 'mhines@usgs.gov',
+            subject: "Failure: ${currentBuild.fullDisplayName}",
+            body: "Failed build of great lakes tiles ${env.BUILD_URL}"
+        }
+        changed {
+            mail to: 'mhines@usgs.gov',
+            subject: "Changes: ${currentBuild.fullDisplayName}",
+            body: "Changes in build of great lakes tiles ${env.BUILD_URL}"
+        }
+    }
+}
