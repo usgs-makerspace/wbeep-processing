@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM artifactory.wma.chs.usgs.gov/docker-official-mirror/ubuntu:18.04
 #based on https://hub.docker.com/r/klokantech/tippecanoe
 #with newer ubuntu
 
