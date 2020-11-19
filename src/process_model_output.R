@@ -25,7 +25,7 @@ var_data_list <- lapply(vars, function(var) {
   fn <- sprintf("%s_%s.nc", today, var)
   nc <- nc_open(fn)
   time <- ncvar_get(nc, varid = "time")
-  hruids <- ncvar_get(nc, varid = "hruid")
+  hruids <- ncvar_get(nc, varid = "nhru")
 
   # Convert ncdf4 times to R dates
   time_att <- ncdf4::ncatt_get(nc, "time")
@@ -53,7 +53,7 @@ var_data_list <- lapply(vars, function(var) {
 
 var_data_all <- bind_rows(var_data_list)
 total_storage_data <- var_data_all %>%
-  group_by(hruid,DOY) %>%
+  group_by(nhru,DOY) %>%
   summarize(total_storage_today = sum(var_values))
 
 # Read in quantile data -- this df is pretty big
@@ -108,12 +108,12 @@ find_value_category <- function(value, labels, ...) {
 percentile_categories <- c("very low", "low", "average", "high", "very high")
 
 values_categorized <- total_storage_data %>%
-  left_join(quantile_df, by = c("hruid","DOY")) %>%
+  left_join(quantile_df, by = c("nhru","DOY")) %>%
   rowwise() %>% 
   mutate(value = find_value_category(value = total_storage_today, 
                                      labels = percentile_categories,
                                      `0%`, `10%`, `25%`, `75%`, `90%`, `100%`)) %>%
-  rename(hru_id_nat = hruid)
+  rename(hru_id_nat = nhru)
 
 if(validate_data) {
   message("Started tests for validating categorized output")

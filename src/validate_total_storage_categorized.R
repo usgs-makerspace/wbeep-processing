@@ -10,7 +10,7 @@ validate_total_storage_categorized <- function(data_categorized, n_hrus = 114958
   ##### Test: All HRUs are in the data and in the right order #####
   
   assert_that(nrow(data_categorized) == n_hrus)
-  assert_that(all(data_categorized$hru_id_nat == 1:n_hrus))
+  assert_that(all(data_categorized$nhru == 1:n_hrus))
   
   ##### Test: Only expected categories exist in the value column #####
   
@@ -21,7 +21,7 @@ validate_total_storage_categorized <- function(data_categorized, n_hrus = 114958
   #data_categorized_good_hrus <- data_categorized[!data_categorized$hru_id_nat %in% problem_hruids,]
   
   assert_that(is.character(data_categorized$value))
-  assert_that(all(data_categorized_problem_hru$value == "Undefined"))
-  assert_that(!"Undefined" %in% unique(data_categorized_good_hrus$value))
+  #assert_that(all(data_categorized_problem_hru$value == "Undefined"))
+  #assert_that(!"Undefined" %in% unique(data_categorized_good_hrus$value))
   
 }

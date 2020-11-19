@@ -54,7 +54,7 @@ if(!file.exists(quantile_fn)) {
   
   # Reshape data
   dt <- as.data.table(total_storage_group_data)
-  dt_long <- melt(dt, id.vars = "hruid", variable.name = "year_doy")
+  dt_long <- melt(dt, id.vars = "nhru", variable.name = "year_doy")
   
   # Split year_doy into separate columns
   # Converting to numeric (type_convert = TRUE) slows down
@@ -63,7 +63,7 @@ if(!file.exists(quantile_fn)) {
   # `fill = NA` to account for missing dates at beginning 
   #   of 1980 and end of 2019
   # This spreads & puts values per doy in a column
-  dt_wide <- dcast(dt_long, hruid+year ~ doy, fun=c, fill=NA)
+  dt_wide <- dcast(dt_long, nhru+year ~ doy, fun=c, fill=NA)
   dt_wide[, year := NULL]
   
   message(sprintf("Start calculating quantiles at %s", Sys.time()))
@@ -72,7 +72,7 @@ if(!file.exists(quantile_fn)) {
 
     message(sprintf("Starting quant calc %s ...", hruid_i))
     
-    hru_data <- dt_wide[hruid == hruid_i,]
+    hru_data <- dt_wide[nhru == hruid_i,]
     
     ############# WORKING ON THIS
     # Still need to figure out best solution for leap years
@@ -101,7 +101,7 @@ if(!file.exists(quantile_fn)) {
     }, dt = hru_data)
     
     hru_quantiles_mat <- do.call("rbind", doy_quantile_list)
-    hru_quantiles_mat <- cbind(hruid = hruid_i, DOY = all_doy_seq, hru_quantiles_mat)
+    hru_quantiles_mat <- cbind(nhru = hruid_i, DOY = all_doy_seq, hru_quantiles_mat)
     
     return(hru_quantiles_mat)
   })

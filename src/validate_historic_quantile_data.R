@@ -7,9 +7,9 @@ validate_historic_quantile_data <- function(quantile_data, n_hrus = 114958, n_da
   ##### Test: dimensions are as expected #####
   percentile_cols <- names(quantile_data)[grepl("%", names(quantile_data))]
   assert_that(nrow(quantile_data) == n_hrus*n_days) # There is one row of data per HRU per day of year
-  assert_that("hruid" %in% names(quantile_data)) # must have hruid col
+  assert_that("nhru" %in% names(quantile_data)) # must have hruid col
   assert_that("DOY" %in% names(quantile_data)) # must have DOY col
-  assert_that(all(names(quantile_data) %in% c("hruid", "DOY", percentile_cols))) # Test that there are no extra columns
+  assert_that(all(names(quantile_data) %in% c("nhru", "DOY", percentile_cols))) # Test that there are no extra columns
   
   ##### Test: percentile columns are within appropriate bounds #####
   percentile_vals <- as.numeric(gsub("%", "", percentile_cols))
@@ -26,8 +26,8 @@ validate_historic_quantile_data <- function(quantile_data, n_hrus = 114958, n_da
   # some do come to light in the future. 
   problem_hruids <- c() # HRUIDs with bad quantiles as numberic values
   real_cols <- percentile_cols[!percentile_cols %in% c("0%", "100%")]
-  quantiles_problem_hru <- unlist(quantile_data[quantile_data$hruid %in% problem_hruids, real_cols, with=FALSE], use.names=F)
-  quantiles_good_hrus <- unlist(quantile_data[!quantile_data$hruid %in% problem_hruids, real_cols, with=FALSE], use.names=F)
+  quantiles_problem_hru <- unlist(quantile_data[quantile_data$nhru %in% problem_hruids, real_cols, with=FALSE], use.names=F)
+  quantiles_good_hrus <- unlist(quantile_data[!quantile_data$nhru %in% problem_hruids, real_cols, with=FALSE], use.names=F)
   assert_that(all(quantiles_problem_hru == 0)) # Every quantile will be 0 for these bad HRUs
   assert_that(any(quantiles_good_hrus > 0)) # There will be some that are greater than zero
   

@@ -9,7 +9,7 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
   # Get a bit more detailed metadata
   meta_info <- nc_meta(fn)
   
-  assert_that(meta_info$dimension$name[1] == "hruid")
+  assert_that(meta_info$dimension$name[1] == "nhru")
   assert_that(meta_info$dimension$name[2] == "time")
   assert_that(meta_info$dimension$length[1] == n_hrus) # Expect all hruids
   assert_that(meta_info$dimension$length[2] == 1) # Expect only one date
