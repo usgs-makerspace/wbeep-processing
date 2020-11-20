@@ -24,7 +24,7 @@ validate_historic_driver_data <- function(var, fn, data_nc, hruids, time, time_f
   assert_that(all(as.vector(hruids) == 1:n_hrus)) # need to make hruids a vector instead of matrix w 1 dim in order to test sameness
   
   ##### Test: NetCDF time is in expected order and expected data type #####
-  assert_that(is.integer(time))
+  assert_that(is.double(time))
   assert_that(length(time) == n_days) # Expect a specific number of days 
   
   ##### Test: NetCDF actual data is formatted as expected #####
