@@ -36,6 +36,7 @@ for(var in vars) {
   
   # Only load rows for current HRUs
   data_nc <- ncvar_get(nc, var, start = c(1,1), count=c(n_hrus, -1))
+  data_nc <- data_nc * 2.54 #convert to mm
   hruids <- ncvar_get(nc, "nhru")
   
   if(length(vars_data) == 0) {

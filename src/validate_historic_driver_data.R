@@ -17,7 +17,7 @@ validate_historic_driver_data <- function(var, fn, data_nc, hruids, time, time_f
   
   # Test unit for variable
   units_att_list <- nc_att(fn, var, "units")[["value"]]
-  assert_that(unlist(units_att_list) == "mm") # Expect millimeters
+  assert_that(unlist(units_att_list) == "inches") # Expect inches
   
   ##### Test: NetCDF hruids are in expected order and the expected data type #####
   assert_that(is.integer(hruids))
