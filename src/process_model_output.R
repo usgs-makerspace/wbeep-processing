@@ -25,7 +25,7 @@ var_data_list <- lapply(vars, function(var) {
   fn <- sprintf("%s_%s.nc", today, var)
   nc <- nc_open(fn)
   time <- ncvar_get(nc, varid = "time")
-  hruids <- ncvar_get(nc, varid = "nhru")
+  hruids <- ncvar_get(nc, varid = "hruid")
 
   # Convert ncdf4 times to R dates
   time_att <- ncdf4::ncatt_get(nc, "time")
