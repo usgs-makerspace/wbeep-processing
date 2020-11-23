@@ -60,8 +60,6 @@ total_storage_data <- var_data_all %>%
 quantile_df <- readRDS("all_quantiles.rds") %>% 
   filter(DOY == lubridate::yday(today))
 
-names(quantile_df)[1]<-"hruid"
-
 get_nonzero_duplicate_indices <- function(x) {
   zeros <- x == 0
   dups <- duplicated(x, fromLast = TRUE)
