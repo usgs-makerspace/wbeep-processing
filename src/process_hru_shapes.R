@@ -7,7 +7,8 @@ gfdb <- "cache/GFv1.1.gdb"
 hru_reduced <- read_sf(gfdb, "nhru_v1_1_simp")  %>% 
   dplyr::select(Shape, nhru_v1_1) %>% 
   st_transform(crs = proj_string) %>% 
-  dplyr::mutate(hru_id_2 = nhru_v1_1) #need ID in two places in final output
+  dplyr::mutate(hru_id_2 = nhru_v1_1) %>% #need ID in two places in final output
+  dplyr::rename(hru_id_nat = nhru_v1_1) #renaming field to match daily data output field
 
 #parallelize validation
 library(parallel)
