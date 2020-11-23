@@ -53,12 +53,14 @@ var_data_list <- lapply(vars, function(var) {
 
 var_data_all <- bind_rows(var_data_list)
 total_storage_data <- var_data_all %>%
-  group_by(nhru,DOY) %>%
+  group_by(hruid,DOY) %>%
   summarize(total_storage_today = sum(var_values))
 
 # Read in quantile data -- this df is pretty big
 quantile_df <- readRDS("all_quantiles.rds") %>% 
   filter(DOY == lubridate::yday(today))
+
+names(quantile_df)[1]<-"hruid"
 
 get_nonzero_duplicate_indices <- function(x) {
   zeros <- x == 0
@@ -108,12 +110,12 @@ find_value_category <- function(value, labels, ...) {
 percentile_categories <- c("very low", "low", "average", "high", "very high")
 
 values_categorized <- total_storage_data %>%
-  left_join(quantile_df, by = c("nhru","DOY")) %>%
+  left_join(quantile_df, by = c("hruid","DOY")) %>%
   rowwise() %>% 
   mutate(value = find_value_category(value = total_storage_today, 
                                      labels = percentile_categories,
                                      `0%`, `10%`, `25%`, `75%`, `90%`, `100%`)) %>%
-  rename(hru_id_nat = nhru)
+  rename(hru_id_nat = hruid)
 
 if(validate_data) {
   message("Started tests for validating categorized output")

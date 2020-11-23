@@ -4,13 +4,13 @@ validate_total_storage_categorized <- function(data_categorized, n_hrus = 114958
   
   ##### Test: Key columns exist in the data #####
   
-  assert_that("nhru" %in% names(data_categorized))
+  assert_that("hru_id_nat" %in% names(data_categorized))
   assert_that("value" %in% names(data_categorized))
   
   ##### Test: All HRUs are in the data and in the right order #####
   
   assert_that(nrow(data_categorized) == n_hrus)
-  assert_that(all(data_categorized$nhru == 1:n_hrus))
+  assert_that(all(data_categorized$hru_id_nat == 1:n_hrus))
   
   ##### Test: Only expected categories exist in the value column #####
   
