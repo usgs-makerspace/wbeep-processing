@@ -1,0 +1,101 @@
+pipeline {
+  agent {
+        node {
+            label 'team:makerspace'
+        }
+    }
+  parameters {
+        gitParameter name: 'BRANCH_TAG',
+                     type: 'PT_BRANCH_TAG',
+                     defaultValue: 'master'
+        choice(choices: ['test', 'qa', 'beta', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
+  }
+  stages {
+    stage('Clean Workspace') {
+      steps{
+        cleanWs()
+      }
+    }
+    stage('Checkout repo and pull model output from S3') {
+      steps {
+        checkout([$class: 'GitSCM',
+                          branches: [[name: "${env.GIT_BRANCH}"]],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [],
+                          gitTool: 'Default',
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[url: 'https://github.com/usgs-makerspace/wbeep-processing']]
+                        ])
+        sh '''
+          rm -f *.nc
+          PATTERN="*.nc"
+          aws s3 sync s3://owi-common-resources/resources/application/nhm-dev/output/data/ . --exclude "*" --include "${PATTERN}"
+          FILES=($PATTERN)
+          DATE="${FILES:0:10}"
+          '''
+      }
+    }
+    stage('convert model output to csv for tile-join') {
+      agent {
+        docker {
+          image 'code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing:R-latest'
+          registryUrl 'https://code.chs.usgs.gov:5001/wma/iidd/wbeep-data-processing'
+          registryCredentialsId 'jenkins_ci_access_token'
+          alwaysPull true
+          reuseNode true
+        } 
+      }
+      steps {
+        sh '''
+          PATTERN="*.nc"
+          FILES=($PATTERN)
+          DATE="${FILES:0:10}"
+          Rscript src/process_model_output_temp.R "${DATE}"
+          '''
+      }
+    }
+    stage('push to S3') {
+      steps { 
+        sh ''' 
+          PATTERN="*.nc"
+          FILES=($PATTERN)
+          DATE="${FILES:0:10}"
+          aws s3 cp stream_temp_${DATE}.csv s3://prod-owi-resources/resources/Application/wbeep/${TIER}/waterTemperature/stream_temp_${DATE}.csv
+          aws s3 cp stream_temp_${DATE}.csv s3://prod-owi-resources/resources/Application/wbeep/wtr_model_output/stream_temp_${DATE}.csv
+          echo ${DATE} > date.txt
+          aws s3 cp date.txt s3://prod-owi-resources/resources/Application/wbeep/${TIER}/waterTemperature/date.txt
+        '''
+      }
+    }
+    stage('build downstream job') {
+      steps { 
+        sh "echo ${params.BRANCH_TAG}"
+        build job: 'tippecanoe_tile_join_segsAllConus', 
+              parameters: [string(name: 'TIER', value: String.valueOf(TIER)),
+              string(name: 'BRANCH_TAG', value: "${params.BRANCH_TAG}")]
+      }
+    }
+  }
+    post {
+        success {
+            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            subject: "${TIER} Success: ${currentBuild.fullDisplayName}",
+            body: "Pipeline finished successfully ${env.BUILD_URL}"
+        }
+        unstable {
+            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            subject: "${TIER} Unstable: ${currentBuild.fullDisplayName}",
+            body: "Pipeline is unstable ${env.BUILD_URL}"
+        }
+        failure {
+            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            subject: "${TIER} Failure: ${currentBuild.fullDisplayName}",
+            body: "Pipeline failed ${env.BUILD_URL}"
+        }
+        changed {
+            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            subject: "${TIER} Changes: ${currentBuild.fullDisplayName}",
+            body: "Pipeline detected changes ${env.BUILD_URL}"
+        }
+    } 
+}

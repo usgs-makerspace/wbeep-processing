@@ -32,7 +32,7 @@ pipeline {
 			aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/waterTemperature/ . --exclude "*" --include "date.txt"
 			date=`cat date.txt`
 			echo "$date"
-			aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/wtr_model_output_csv/ . --exclude "*" --include "stream_temp_${date//-/_}.csv"
+			aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/waterTemperature/ . --exclude "*" --include "stream_temp_${date}.csv"
 			aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/${TIER}/segsAllConus/tilesSegsAllConus ${WORKSPACE}/tilesSegsAllConus
 			'''
       }
@@ -50,7 +50,7 @@ pipeline {
       steps {
         sh '''
           date=`cat date.txt`
-          tile-join --force -pk --output-to-directory tiles -c stream_temp_${date//-/_}.csv tilesSegsAllConus
+          tile-join --force -pk --output-to-directory tiles -c stream_temp_${date}.csv tilesSegsAllConus
 		'''
       }
     }
