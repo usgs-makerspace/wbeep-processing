@@ -36,7 +36,7 @@ pipeline {
           rm -f *.nc
           PATTERN="*.nc"
           aws s3 sync s3://owi-common-resources/resources/application/nhm-dev/output/data/ . --exclude "*" --include "${PATTERN}"
-          aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/model_output/ . --exclude "*" --include "all_quantiles.rds"
+          aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/model_output/${TIER}/ . --exclude "*" --include "all_quantiles.rds"
           FILES=($PATTERN)
           DATE="${FILES:0:10}"
           '''
