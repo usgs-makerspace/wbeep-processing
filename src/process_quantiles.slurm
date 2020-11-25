@@ -7,12 +7,12 @@
 #SBATCH --time=00:30:00        # time at which the process will be cancelled if unfinished
 #SBATCH --mem=80GB
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=lplatt@usgs.gov
+#SBATCH --mail-user=mhines@usgs.gov
 #SBATCH --export=ALL
-#SBATCH --array=1-110 # 109,951 HRUs / 1000 HRUs per task = 110 tasks
+#SBATCH --array=1-115 # 114958 HRUs / 1000 HRUs per task = 115 tasks
 
 mkdir -p grouped_quantiles
 
-module load R/3.5.1-gcc7.1.0
+module load R/3.6.1
 
 srun Rscript src/process_quantiles.R

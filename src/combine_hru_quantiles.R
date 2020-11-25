@@ -21,7 +21,7 @@ original_quantiles <- tail(names(combined_data), -2)
 combined_data <- as.data.table(combined_data)
 combined_data[, "0%" := -Inf]
 combined_data[, "100%" := Inf]
-setcolorder(combined_data, c("hruid", "DOY", "0%",
+setcolorder(combined_data, c("nhru", "DOY", "0%",
                              original_quantiles,
                              "100%"))
 

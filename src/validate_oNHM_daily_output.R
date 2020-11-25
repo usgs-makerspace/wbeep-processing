@@ -2,7 +2,7 @@ library(assertthat)
 library(ncmeta)
 
 validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time, 
-                                       time_fixed, validate_fn, n_hrus = 109951) {
+                                       time_fixed, validate_fn, n_hrus = 114958) {
   
   ##### Test: NetCDF dimensions and variables are as expected #####
   

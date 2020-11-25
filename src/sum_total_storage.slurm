@@ -6,12 +6,13 @@
 #SBATCH --time=00:45:00        # time at which the process will be cancelled if unfinished
 #SBATCH --mem=100GB
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=lplatt@usgs.gov
+#SBATCH --mail-user=mhines@usgs.gov
 #SBATCH -o logs/slurm_sum_storage.out            # log file for each jobid (can insert %A_%a for each array id task if needed)
 #SBATCH --export=ALL
 
 mkdir -p grouped_total_storage
 
-module load R/3.5.1-gcc7.1.0
+module load R/3.6.1
+module load netcdf
 
 srun Rscript src/sum_total_storage.R

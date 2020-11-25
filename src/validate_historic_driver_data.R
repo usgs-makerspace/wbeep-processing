@@ -1,7 +1,7 @@
 library(assertthat)
 library(ncmeta)
 
-validate_historic_driver_data <- function(var, fn, data_nc, hruids, time, time_fixed, n_hrus = 109951, n_days = 12783) {
+validate_historic_driver_data <- function(var, fn, data_nc, hruids, time, time_fixed, n_hrus = 114958, n_days = 14975) {
   
   # 12783 days is ~ 35 years
   
@@ -10,21 +10,21 @@ validate_historic_driver_data <- function(var, fn, data_nc, hruids, time, time_f
   # Get a bit more detailed metadata
   meta_info <- nc_meta(fn)
   
-  assert_that(meta_info$dimension$name[1] == "hruid")
+  assert_that(meta_info$dimension$name[1] == "nhru")
   assert_that(meta_info$dimension$name[2] == "time")
   assert_that(meta_info$dimension$length[1] == n_hrus) # Expect all hruids
   assert_that(meta_info$dimension$length[2] == n_days) # Expect a specific number of days
   
   # Test unit for variable
   units_att_list <- nc_att(fn, var, "units")[["value"]]
-  assert_that(unlist(units_att_list) == "mm") # Expect millimeters
+  assert_that(unlist(units_att_list) == "inches") # Expect inches
   
   ##### Test: NetCDF hruids are in expected order and the expected data type #####
   assert_that(is.integer(hruids))
   assert_that(all(as.vector(hruids) == 1:n_hrus)) # need to make hruids a vector instead of matrix w 1 dim in order to test sameness
   
   ##### Test: NetCDF time is in expected order and expected data type #####
-  assert_that(is.integer(time))
+  assert_that(is.double(time))
   assert_that(length(time) == n_days) # Expect a specific number of days 
   
   ##### Test: NetCDF actual data is formatted as expected #####

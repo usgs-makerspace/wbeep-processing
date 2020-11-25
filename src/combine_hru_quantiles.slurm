@@ -10,6 +10,6 @@
 #SBATCH -o logs/slurm_combine.out            # log file for each jobid (can insert %A_%a for each array id task if needed)
 #SBATCH --export=ALL
 
-module load R/3.5.1-gcc7.1.0
+module load R/3.6.1
 
 srun Rscript src/combine_hru_quantiles.R

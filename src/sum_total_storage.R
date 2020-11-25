@@ -8,7 +8,7 @@ library(data.table)
 
 source("src/validate_historic_driver_data.R") # load code to test model data
 
-n_hrus <- 109951
+n_hrus <- 114958
 n_hrus_per_group <- 1000
 
 start_of_loop <- Sys.time()
@@ -36,7 +36,8 @@ for(var in vars) {
   
   # Only load rows for current HRUs
   data_nc <- ncvar_get(nc, var, start = c(1,1), count=c(n_hrus, -1))
-  hruids <- ncvar_get(nc, "hruid")
+  data_nc <- data_nc * 25.4 #convert to mm
+  hruids <- ncvar_get(nc, "nhru")
   
   if(length(vars_data) == 0) {
     vars_data <- data_nc
@@ -104,7 +105,7 @@ for(g in 1:n_groups) {
   year_doy_vector <- format(time_fixed, "%Y_%j")
   dt <- as.data.table(hru_group_data)
   dt[, hruid := hruid_start:hruid_end]
-  names(dt) <- c(year_doy_vector, "hruid")
+  names(dt) <- c(year_doy_vector, "nhru")
 
   # With feather, took 12 seconds & files were 109.2 MB
   # With fread, took 58 seconds & average file was 125 MB
