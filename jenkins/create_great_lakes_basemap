@@ -41,7 +41,7 @@ pipeline {
       }
       steps {
         sh "mkdir ${WORKSPACE}/greatlakes"
-        sh 'tippecanoe -z6 -Z0 --no-simplification-of-shared-nodes --no-feature-limit --no-tile-size-limit --output-to-directory greatlakes Great_Lakes.json'
+        sh 'tippecanoe -z8 -Z0 --no-simplification-of-shared-nodes --no-feature-limit --no-tile-size-limit --output-to-directory greatlakes Great_Lakes.json'
       }
     }
     stage('push to S3') {
