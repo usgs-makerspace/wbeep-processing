@@ -49,10 +49,33 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
     # Write out a text file that will eventually cause the Jenkins file to send an email
     # Add information about the current var to the file.
     bad_data_hruids <- hruids[which(data_nc >= 10000)]
+    message("The following HRUIDs have problematic data >= 10,000: ", 
+            var," \n", paste(bad_data_hruids, collapse = "\n"))
     write(x = sprintf("The following HRUIDs have %s data >= 10,000: %s", 
                       var, paste(bad_data_hruids, collapse = ", ")), 
           file = validate_fn,
           append = TRUE)
   }
+  
+  # Compare today's data against variable-specific quantiles
+  # Read in variable's historic quantile data -- keep only hruid and 90% column to calculate max value for comparison
+  # Make sure to order by hruid so when we add today's data its in the right order
+  filename <- paste0(var,"_quantiles.rds")
+  var_quantile_df <- readRDS(filename) %>%
+    filter(DOY == lubridate::yday(today)) %>%
+    rename(hruid = nhru) %>%
+    arrange(hruid) %>%
+    select(1,21)
+  
+  # add max value for comparison 150% of the max value/90th value
+  var_quantile_df$max_value <- var_quantile_df$`90%`*1.5
+  var_quantile_df$today <- data_nc
+  
+  # keep table of data to share
+  higher_than_max <- var_quantile_df %>%
+    filter(var_quantile_df$today>var_quantile_df$max_value)
+  
+  message("There were ", nrow(higher_than_max)," values above max expected for ", var, ".")
+  write.csv(higher_than_max,paste0(var,"_higher_than_max_",today,".csv"), row.names = FALSE)
   
 }
