@@ -65,7 +65,7 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
     filter(DOY == lubridate::yday(today)) %>%
     rename(hruid = nhru) %>%
     arrange(hruid) %>%
-    select(1,21)
+    select(hruid,`90%`)
   
   # add max value for comparison 150% of the max value/90th value
   var_quantile_df$max_value <- var_quantile_df$`90%`*1.5
