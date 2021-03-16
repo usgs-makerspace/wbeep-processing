@@ -58,17 +58,17 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
   }
   
   # Compare today's data against variable-specific quantiles
-  # Read in variable's historic quantile data -- keep only hruid and 90% column to calculate max value for comparison
+  # Read in variable's historic quantile data -- keep only hruid and 95% column to calculate max value for comparison
   # Make sure to order by hruid so when we add today's data its in the right order
   filename <- paste0(var,"_quantiles.rds")
   var_quantile_df <- readRDS(filename) %>%
     filter(DOY == lubridate::yday(today)) %>%
     rename(hruid = nhru) %>%
     arrange(hruid) %>%
-    select(hruid,`90%`) %>%
+    select(hruid,`95%`) %>%
     
   # add max value for comparison 150% of the max value/90th value
-    mutate(max_value =`90%`*1.5) %>%
+    mutate(max_value =`95%`*1.5) %>%
     mutate(today = data_nc)
   
   # keep table of data to share
