@@ -1,5 +1,5 @@
 library(ncdf4)
-library(data.table)
+library(dplyr)
 
 vars <- c(
   "soil_moist_tot",
@@ -32,8 +32,10 @@ for(var in vars) {
     vars_data <- vars_data + data_nc
   }
   
-  hru_max <- apply(vars_data, 1, max, na.rm = TRUE)
-  write.csv(hru_max, sprintf("max_%s.csv", var))
+  hru_max <- as.data.frame(apply(vars_data, 1, max, na.rm = TRUE)) %>%
+    mutate(hruid <- hruids)
+  colnames(hru_max) <- c("max_value", "hruid")
+  write.csv(hru_max, sprintf("max_%s.csv", var), row.names = FALSE)
   
   nc_close(nc)
   gc() # garbage cleanup
