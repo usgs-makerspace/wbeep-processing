@@ -68,8 +68,8 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
     select(hruid,`90%`) %>%
     
   # add max value for comparison 150% of the max value/90th value
-    mutate(max_value <- `90%`*1.5) %>%
-    mutate(today <- data_nc)
+    mutate(max_value =`90%`*1.5) %>%
+    mutate(today = data_nc)
   
   # keep table of data to share
   higher_than_max <- var_quantile_df %>%
