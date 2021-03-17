@@ -41,7 +41,7 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
     message("DATA = GOOD")
     # Write out a text file that won't have Jenkins send an email.
     # Add information about the current var to the file.
-    write(x = sprintf("%s data: NULL", var), 
+    write(x = sprintf("%s data:\nNo values above 10,000", var), 
           file = validate_fn,
           append = TRUE)
   } else {
@@ -76,6 +76,21 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
     filter(today > max_value)
   
   message("There were ", nrow(higher_than_max)," values above max expected for ", var, ".")
+  write(x = sprintf("There were %s values above max expected for %s.",nrow(higher_than_max), var), 
+        file = validate_fn,
+        append = TRUE)
   write.csv(higher_than_max,paste0(var,"_higher_than_max_",today,".csv"), row.names = FALSE)
   
+  # compare with table of max values for each hru, irregardless of day of year
+  var_max_hru <- read.csv(paste0("max_",var,".csv")) %>%
+    mutate(today = data_nc)
+  
+  higher_than_ever <- var_max_hru %>%
+    filter(today > max_value)
+  
+  message("There were ", nrow(higher_than_ever)," values above their highest max for ", var, ".")
+  write(x = sprintf("There were %s values above their highest max for %s.\n",nrow(higher_than_ever), var), 
+        file = validate_fn,
+        append = TRUE)
+  write.csv(higher_than_ever,paste0(var,"_higher_than_ever_",today,".csv"), row.names = FALSE)
 }
