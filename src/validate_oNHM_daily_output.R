@@ -68,15 +68,15 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
     select(hruid,`95%`) %>%
     
   # add max value for comparison 150% of the max value/90th value
-    mutate(max_value =`95%`*1.5) %>%
+    mutate(max_value150x95Q =`95%`*1.5) %>%
     mutate(today = data_nc)
   
   # keep table of data to share
   higher_than_max <- var_quantile_df %>%
-    filter(today > max_value)
+    filter(today > max_value150x95Q)
   
-  message("There were ", nrow(higher_than_max)," values above max expected for ", var, ".")
-  write(x = sprintf("There were %s values above max expected for %s.",nrow(higher_than_max), var), 
+  message("There were ", nrow(higher_than_max)," values above max_value150x95Q for ", var, ".")
+  write(x = sprintf("There were %s values above max_value150x95Q for %s.",nrow(higher_than_max), var), 
         file = validate_fn,
         append = TRUE)
   write.csv(higher_than_max,paste0(var,"_higher_than_max_",today,".csv"), row.names = FALSE)
