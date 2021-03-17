@@ -110,7 +110,7 @@ pipeline {
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test.txt
 
             Review model output comparison outputs:
-            Daily values exceeding historical quantiles 95th%X1.5:
+            Daily values exceeding historical quantiles 95th%x1.5:
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/dprst_stor_hru_higher_than_max_${DATE}.csv
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/soil_moist_tot_higher_than_max_${DATE}.csv
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/hru_intcpstor_higher_than_max_${DATE}.csv
@@ -136,6 +136,7 @@ pipeline {
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test.txt
 
             Review model output comparison outputs:
+            Daily values exceeding historical quantiles 95th%x1.5:
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/dprst_stor_hru_higher_than_max_${DATE}.csv
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/soil_moist_tot_higher_than_max_${DATE}.csv
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/hru_intcpstor_higher_than_max_${DATE}.csv
@@ -159,8 +160,9 @@ pipeline {
 
             Test result summary:
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test.txt
-
+            
             Review model output comparison outputs:
+            Daily values exceeding historical quantiles 95th%x1.5:
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/dprst_stor_hru_higher_than_max_${DATE}.csv
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/soil_moist_tot_higher_than_max_${DATE}.csv
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/hru_intcpstor_higher_than_max_${DATE}.csv
@@ -186,6 +188,7 @@ pipeline {
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test.txt
 
             Review model output comparison outputs:
+            Daily values exceeding historical quantiles 95th%x1.5:
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/dprst_stor_hru_higher_than_max_${DATE}.csv
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/soil_moist_tot_higher_than_max_${DATE}.csv
             http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/hru_intcpstor_higher_than_max_${DATE}.csv
