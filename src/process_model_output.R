@@ -9,7 +9,7 @@ validate_data <- args[2] == "yes" # defaults to 'yes'
 
 # Remove the file if it exists in the workspace before checks begin
 #   to avoid any contamination from older jobs
-validate_fn <- "order_of_magnitude_test.txt"
+validate_fn <- paste0("order_of_magnitude_test_",today,".txt")
 if(validate_data & file.exists(validate_fn)) {
   file.remove(validate_fn)
 }
