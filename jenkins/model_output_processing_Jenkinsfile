@@ -86,6 +86,11 @@ pipeline {
     }
   }
     post {
+      sh '''
+          PATTERN="*.nc"
+          FILES=($PATTERN)
+          DATE="${FILES:0:10}"
+          '''
         success {
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Success: ${currentBuild.fullDisplayName}",
