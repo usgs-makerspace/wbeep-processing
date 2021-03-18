@@ -13,7 +13,7 @@ pipeline {
         choice(choices: ['yes', 'no'], description: 'Run validation script or not', name: 'VALIDATE_DATA')
   }
   environment {
-    def DATE = "${params.DATE}"
+    def DATE = env.DATE
   }
   stages {
     stage('Clean Workspace') {
