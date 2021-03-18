@@ -86,12 +86,12 @@ pipeline {
     }
   }
     post {
-      sh '''
-          PATTERN="*.nc"
-          FILES=($PATTERN)
-          DATE="${FILES:0:10}"
-          '''
         success {
+            sh '''
+              PATTERN="*.nc"
+              FILES=($PATTERN)
+              DATE="${FILES:0:10}"
+            '''
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Success: ${currentBuild.fullDisplayName}",
             body: """Pipeline finished successfully ${env.BUILD_URL}
@@ -118,6 +118,11 @@ pipeline {
             """
         }
         unstable {
+            sh '''
+              PATTERN="*.nc"
+              FILES=($PATTERN)
+              DATE="${FILES:0:10}"
+            '''          
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Unstable: ${currentBuild.fullDisplayName}",
             body: """Pipeline is unstable ${env.BUILD_URL}
@@ -144,6 +149,11 @@ pipeline {
             """
         }
         failure {
+            sh '''
+              PATTERN="*.nc"
+              FILES=($PATTERN)
+              DATE="${FILES:0:10}"
+            '''          
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Failure: ${currentBuild.fullDisplayName}",
             body: """Pipeline failed ${env.BUILD_URL}
@@ -170,6 +180,11 @@ pipeline {
             """
         }
         changed {
+            sh '''
+              PATTERN="*.nc"
+              FILES=($PATTERN)
+              DATE="${FILES:0:10}"
+            '''          
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Changes: ${currentBuild.fullDisplayName}",
             body: """Pipeline detected changes ${env.BUILD_URL}
