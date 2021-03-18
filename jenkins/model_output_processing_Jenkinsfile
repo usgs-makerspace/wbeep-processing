@@ -11,9 +11,6 @@ pipeline {
         choice(choices: ['test', 'qa', 'beta', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
         choice(choices: ['yes', 'no'], description: 'Run validation script or not', name: 'VALIDATE_DATA')
   }
-  environment {
-    DATE = ''
-  }
   stages {
     stage('Clean Workspace') {
       steps{
@@ -95,88 +92,88 @@ pipeline {
             subject: "${TIER} Success: ${currentBuild.fullDisplayName}",
             body: "Pipeline finished successfully \'${env.BUILD_URL}\'\n" +
             "Test result summary:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/order_of_magnitude_test_\'${env.DATE}\'.txt\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/order_of_magnitude_test_${env.DATE}.txt\n" +
             "Review model output comparison outputs:\n" +
             "Daily values exceeding historical quantiles 95th%x1.5:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_max_\'${env.DATE}\'.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_max_${env.DATE}.csv\n" +
             "Daily values exceeding historical max:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_ever_\'${env.DATE}\'.csv\n"
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_ever_${env.DATE}.csv\n"
         }
         unstable {        
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Unstable: ${currentBuild.fullDisplayName}",
             body: "Pipeline finished successfully \'${env.BUILD_URL}\'\n" +
             "Test result summary:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/order_of_magnitude_test_\'${env.DATE}\'.txt\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/order_of_magnitude_test_${env.DATE}.txt\n" +
             "Review model output comparison outputs:\n" +
             "Daily values exceeding historical quantiles 95th%x1.5:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_max_\'${env.DATE}\'.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_max_${env.DATE}.csv\n" +
             "Daily values exceeding historical max:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_ever_\'${env.DATE}\'.csv\n"
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_ever_${env.DATE}.csv\n"
        }
         failure {       
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Failure: ${currentBuild.fullDisplayName}",
             body: "Pipeline finished successfully \'${env.BUILD_URL}\'\n" +
             "Test result summary:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/order_of_magnitude_test_\'${env.DATE}\'.txt\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/order_of_magnitude_test_${env.DATE}.txt\n" +
             "Review model output comparison outputs:\n" +
             "Daily values exceeding historical quantiles 95th%x1.5:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_max_\'${env.DATE}\'.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_max_${env.DATE}.csv\n" +
             "Daily values exceeding historical max:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_ever_\'${env.DATE}\'.csv\n"
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_ever_${env.DATE}.csv\n"
       }
         changed {    
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Changes: ${currentBuild.fullDisplayName}",
             body: "Pipeline finished successfully \'${env.BUILD_URL}\'\n" +
             "Test result summary:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/order_of_magnitude_test_\'${env.DATE}\'.txt\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/order_of_magnitude_test_${env.DATE}.txt\n" +
             "Review model output comparison outputs:\n" +
             "Daily values exceeding historical quantiles 95th%x1.5:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_max_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_max_\'${env.DATE}\'.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_max_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_max_${env.DATE}.csv\n" +
             "Daily values exceeding historical max:\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_ever_\'${env.DATE}\'.csv\n" +
-            "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_ever_\'${env.DATE}\'.csv\n"
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/dprst_stor_hru_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/soil_moist_tot_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_intcpstor_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/pkwater_equiv_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_ever_${env.DATE}.csv\n" +
+            "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_ever_${env.DATE}.csv\n"
        }
     }  
 }
