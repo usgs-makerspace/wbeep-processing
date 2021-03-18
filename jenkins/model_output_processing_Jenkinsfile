@@ -94,7 +94,7 @@ pipeline {
             '''
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Success: ${currentBuild.fullDisplayName}",
-            body: "Pipeline finished successfully ${env.BUILD_URL}
+            body: """Pipeline finished successfully ${env.BUILD_URL}
 
             Test result summary:
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsorder_of_magnitude_test_${DATE}.txt
@@ -114,7 +114,8 @@ pipeline {
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultshru_intcpstor_higher_than_ever_${DATE}.csv
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultspkwater_equiv_higher_than_ever_${DATE}.csv
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultshru_impervstor_higher_than_ever_${DATE}.csv
-            https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsgwres_stor_higher_than_ever_${DATE}.csv"
+            https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsgwres_stor_higher_than_ever_${DATE}.csv
+            """
         }
         unstable {
             sh '''
@@ -124,7 +125,7 @@ pipeline {
             '''          
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Unstable: ${currentBuild.fullDisplayName}",
-            body: "Pipeline is unstable ${env.BUILD_URL}
+            body: """Pipeline is unstable ${env.BUILD_URL}
 
             Test result summary:
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsorder_of_magnitude_test_${DATE}.txt
@@ -144,7 +145,8 @@ pipeline {
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultshru_intcpstor_higher_than_ever_${DATE}.csv
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultspkwater_equiv_higher_than_ever_${DATE}.csv
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultshru_impervstor_higher_than_ever_${DATE}.csv
-            https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsgwres_stor_higher_than_ever_${DATE}.csv"
+            https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsgwres_stor_higher_than_ever_${DATE}.csv
+            """
         }
         failure {
             sh '''
@@ -154,7 +156,7 @@ pipeline {
             '''          
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Failure: ${currentBuild.fullDisplayName}",
-            body: "Pipeline failed ${env.BUILD_URL}
+            body: """Pipeline failed ${env.BUILD_URL}
 
             Test result summary:
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsorder_of_magnitude_test_${DATE}.txt
@@ -174,7 +176,8 @@ pipeline {
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultshru_intcpstor_higher_than_ever_${DATE}.csv
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultspkwater_equiv_higher_than_ever_${DATE}.csv
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultshru_impervstor_higher_than_ever_${DATE}.csv
-            https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsgwres_stor_higher_than_ever_${DATE}.csv"
+            https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsgwres_stor_higher_than_ever_${DATE}.csv
+            """
         }
         changed {
             sh '''
@@ -184,7 +187,7 @@ pipeline {
             '''          
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Changes: ${currentBuild.fullDisplayName}",
-            body: "Pipeline detected changes ${env.BUILD_URL}
+            body: """Pipeline detected changes ${env.BUILD_URL}
 
             Test result summary:
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsorder_of_magnitude_test_${DATE}.txt
@@ -204,7 +207,8 @@ pipeline {
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultshru_intcpstor_higher_than_ever_${DATE}.csv
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultspkwater_equiv_higher_than_ever_${DATE}.csv
             https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultshru_impervstor_higher_than_ever_${DATE}.csv
-            https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsgwres_stor_higher_than_ever_${DATE}.csv"
+            https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_resultsgwres_stor_higher_than_ever_${DATE}.csv
+            """
         }
     }  
 }
