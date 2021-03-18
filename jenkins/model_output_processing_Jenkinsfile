@@ -5,11 +5,15 @@ pipeline {
         }
     }
   parameters {
+        string(name: 'DATE', defaultValue: '')
         gitParameter name: 'BRANCH_TAG',
                      type: 'PT_BRANCH_TAG',
                      defaultValue: 'master'
         choice(choices: ['test', 'qa', 'beta', 'prod'], description: 'Tier to deploy tiles to', name: 'TIER')
         choice(choices: ['yes', 'no'], description: 'Run validation script or not', name: 'VALIDATE_DATA')
+  }
+  environment {
+    def DATE = "${params.DATE}"
   }
   stages {
     stage('Clean Workspace') {
@@ -87,11 +91,6 @@ pipeline {
   }
     post {
         success {
-            sh '''
-              PATTERN="*.nc"
-              FILES=($PATTERN)
-              DATE="${FILES:0:10}"
-            '''
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Success: ${currentBuild.fullDisplayName}",
             body: "Pipeline finished successfully \'${env.BUILD_URL}\'\n" +
@@ -113,12 +112,7 @@ pipeline {
             "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_ever_\'${DATE}\'.csv\n" +
             "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_ever_\'${DATE}\'.csv\n"
         }
-        unstable {
-            sh '''
-              PATTERN="*.nc"
-              FILES=($PATTERN)
-              DATE="${FILES:0:10}"
-            '''          
+        unstable {        
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Unstable: ${currentBuild.fullDisplayName}",
             body: "Pipeline finished successfully \'${env.BUILD_URL}\'\n" +
@@ -140,12 +134,7 @@ pipeline {
             "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_ever_\'${DATE}\'.csv\n" +
             "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_ever_\'${DATE}\'.csv\n"
        }
-        failure {
-            sh '''
-              PATTERN="*.nc"
-              FILES=($PATTERN)
-              DATE="${FILES:0:10}"
-            '''          
+        failure {       
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Failure: ${currentBuild.fullDisplayName}",
             body: "Pipeline finished successfully \'${env.BUILD_URL}\'\n" +
@@ -167,12 +156,7 @@ pipeline {
             "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/hru_impervstor_higher_than_ever_\'${DATE}\'.csv\n" +
             "https://wbeep-\'${TIER}\'-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/gwres_stor_higher_than_ever_\'${DATE}\'.csv\n"
       }
-        changed {
-            sh '''
-              PATTERN="*.nc"
-              FILES=($PATTERN)
-              DATE="${FILES:0:10}"
-            '''          
+        changed {    
             mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
             subject: "${TIER} Changes: ${currentBuild.fullDisplayName}",
             body: "Pipeline finished successfully \'${env.BUILD_URL}\'\n" +
