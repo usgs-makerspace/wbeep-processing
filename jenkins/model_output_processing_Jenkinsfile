@@ -107,7 +107,7 @@ pipeline {
             body: """Pipeline finished successfully ${env.BUILD_URL}
 
             Test result summary:
-            http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test.txt
+            http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test_${DATE}.txt
 
             Review model output comparison outputs:
             Daily values exceeding historical quantiles 95th%x1.5:
@@ -133,7 +133,7 @@ pipeline {
             body: """Pipeline is unstable ${env.BUILD_URL}
 
             Test result summary:
-            http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test.txt
+            http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test_${DATE}.txt
 
             Review model output comparison outputs:
             Daily values exceeding historical quantiles 95th%x1.5:
@@ -159,7 +159,7 @@ pipeline {
             body: """Pipeline failed ${env.BUILD_URL}
 
             Test result summary:
-            http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test.txt
+            http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test_${DATE}.txt
             
             Review model output comparison outputs:
             Daily values exceeding historical quantiles 95th%x1.5:
@@ -185,7 +185,7 @@ pipeline {
             body: """Pipeline detected changes ${env.BUILD_URL}
 
             Test result summary:
-            http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test.txt
+            http://wbeep-${TIER}-website.s3-website-us-west-2.amazonaws.com/estimated-availability/date/order_of_magnitude_test_${DATE}.txt
 
             Review model output comparison outputs:
             Daily values exceeding historical quantiles 95th%x1.5:
