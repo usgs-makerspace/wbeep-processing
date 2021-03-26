@@ -9,7 +9,7 @@ validate_data <- args[2] == "yes" # defaults to 'yes'
 
 # Remove the file if it exists in the workspace before checks begin
 #   to avoid any contamination from older jobs
-validate_fn <- paste0("order_of_magnitude_test_",today,".txt")
+validate_fn <- paste0("order_of_magnitude_test_",today,".html")
 if(validate_data & file.exists(validate_fn)) {
   file.remove(validate_fn)
 }
@@ -20,6 +20,9 @@ source("src/validate_total_storage_categorized.R") # load code to test output of
 # Combine nc files for each var
 vars <- c("soil_moist_tot", "hru_intcpstor", "pkwater_equiv",
           "hru_impervstor", "gwres_stor", "dprst_stor_hru")
+
+write(x = sprintf("<html><body>"), 
+      file = validate_fn)
 
 var_data_list <- lapply(vars, function(var) {
   fn <- sprintf("%s_%s.nc", today, var)
@@ -121,5 +124,8 @@ if(validate_data) {
   validate_total_storage_categorized(values_categorized)
   message("Completed tests for validating categorized output")
 }
+
+write(x = sprintf("</body></html>"), 
+      file = validate_fn)
 
 readr::write_csv(values_categorized, "model_output_categorized.csv")

@@ -38,6 +38,7 @@ pipeline {
           aws s3 sync s3://owi-common-resources/resources/application/nhm-dev/output/data/ . --exclude "*" --include "${PATTERN}"
           aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/model_output/${TIER}/ . --exclude "*" --include "all_quantiles.rds"
           aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/model_output/${TIER}/variables/ . --exclude "*" --include "*.rds" --include "*.csv"
+          aws s3 sync s3://prod-owi-resources/resources/Application/wbeep/model_output/${TIER}/hru_shape/ . --exclude "*" --exclude "hrus.geojson" --include "hrus*.*" --include "states*.*"
           FILES=($PATTERN)
           DATE="${FILES:0:10}"
           '''
