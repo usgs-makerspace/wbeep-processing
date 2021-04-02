@@ -1,7 +1,5 @@
 library(assertthat)
 library(ncmeta)
-library(sf)
-library(ggplot2)
 
 validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time, 
                                        time_fixed, validate_fn, n_hrus = 114958) {
@@ -34,9 +32,7 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
   assert_that(is.double(data_nc))
   assert_that(dim(data_nc) == n_hrus) 
   
-  #Read in the shapefiles for hrus and background states layer so we can map the hrus that are flagged
-  hrus <- st_read(dsn=".",layer="hrus")
-  states <- st_read(dsn=".",layer="states")
+  source("src/validate_oNHM_maps.R") # load code to draw maps of hrus that violate tests
   
   # General order of magnitude test
   # Max of total storage in all of historic data for all HRUs is ~8,000 mm
@@ -57,20 +53,8 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
     bad_data_hruids <- hruids[which(data_nc >= 10000)]
     message("The following HRUIDs have problematic data >= 10,000: %s ", 
             var, paste(bad_data_hruids, collapse = "\n"))
-    hrus_to_plot <- hrus[hrus$hru_id_nat %in% bad_data_hruids,]
     mapfilename <- sprintf("map_%s_data_over_10k_%s.png",var,today)
-    map <- ggplot() + 
-      geom_sf(data = states, size=1, color="gray", fill="white") +
-      geom_sf(data = hrus_to_plot, size = 2, color = "red", fill = "white") + 
-      geom_sf_text(data = hrus_to_plot,
-                   aes(label = hrus_to_plot$hru_id_nat),
-                   size=3,
-                   color="blue",
-                   nudge_x = -1, 
-                   nudge_y = -1) +
-      ggtitle(sprintf("hrus with %s data >= 10,000",var)) + 
-      coord_sf()
-    ggsave(mapfilename, plot=last_plot(), device=NULL, width=10, height= 8, units="in")
+    validate_oNHM_maps(bad_data_hruids, mapfilename, var) 
     write(x = sprintf("The following HRUIDs have %s data >= 10,000: %s [ <a href='%s' target='_blank'>map</a> ]<br />", 
                       var, paste(bad_data_hruids, collapse = ", "), mapfilename), 
           file = validate_fn,
@@ -97,20 +81,8 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
   
   message("There were ", nrow(higher_than_max)," values above max_value150x95Q for ", var, ".")
   higher_than_max_hrus <- higher_than_max$hruid
-  hrus_to_plot <- hrus[hrus$hru_id_nat %in% higher_than_max_hrus,]
   mapfilename <- sprintf("map_%s_data_higher_than_max_value150x95Q_%s.png",var,today)
-  map <- ggplot() + 
-    geom_sf(data = states, size=1, color="gray", fill="white") +
-    geom_sf(data = hrus_to_plot, size = 2, color = "red", fill = "white") + 
-    geom_sf_text(data = hrus_to_plot,
-                 aes(label = hrus_to_plot$hru_id_nat),
-                 size=3,
-                 color="blue",
-                 nudge_x = -1, 
-                 nudge_y = -1) +
-    ggtitle(sprintf("hrus with %s data higher than max_value150x95Q",var)) + 
-    coord_sf()
-  ggsave(mapfilename, plot=last_plot(), device=NULL, width=10, height= 8, units="in")
+  validate_oNHM_maps(higher_than_max_hrus, mapfilename, var)  
   write(x = sprintf("There were %s values above max_value150x95Q for %s. [ <a href='%s_higher_than_max_%s.csv' target='_blank'>csv</a> | <a href='%s' target='_blank'>map</a> ]<br />",nrow(higher_than_max), var, var, today, mapfilename), 
         file = validate_fn,
         append = TRUE)
@@ -125,20 +97,8 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
   
   message("There were ", nrow(higher_than_ever)," values above their highest max for ", var, ".")
   higher_than_ever_hrus <- higher_than_ever$hruid
-  hrus_to_plot <- hrus[hrus$hru_id_nat %in% higher_than_ever_hrus,]
   mapfilename <- sprintf("map_%s_data_higher_than_ever_%s.png",var,today)
-  map <- ggplot() + 
-    geom_sf(data = states, size=1, color="gray", fill="white") +
-    geom_sf(data = hrus_to_plot, size = 2, color = "red", fill = "white") + 
-    geom_sf_text(data = hrus_to_plot,
-                 aes(label = hrus_to_plot$hru_id_nat),
-                 size=3,
-                 color="blue",
-                 nudge_x = -1, 
-                 nudge_y = -1) +
-    ggtitle(sprintf("hrus with %s data higher than ever",var)) + 
-    coord_sf()
-  ggsave(mapfilename, plot=last_plot(), device=NULL, width=10, height= 8, units="in")
+  validate_oNHM_maps(higher_than_ever_hrus, mapfilename, var) 
   write(x = sprintf("There were %s values above their highest max for %s. [ <a href='%s_higher_than_max_%s.csv' target='_blank'>csv</a> | <a href='%s' target='_blank'>map</a> ]<br /><br />",nrow(higher_than_ever), var, var, today, mapfilename), 
         file = validate_fn,
         append = TRUE)
