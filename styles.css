@@ -1,0 +1,22 @@
+html, body {
+  height: 100%;
+  margin: 5;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+  text-align: center;
+}
+
+h2 {
+  text-decoration: underline;
+}
+
+img {
+  padding: 0;
+  display: block;
+  margin: 0 auto;
+  max-height: 100%;
+  max-width: 100%;
+}

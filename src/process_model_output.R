@@ -21,7 +21,7 @@ source("src/validate_total_storage_categorized.R") # load code to test output of
 vars <- c("soil_moist_tot", "hru_intcpstor", "pkwater_equiv",
           "hru_impervstor", "gwres_stor", "dprst_stor_hru")
 
-write(x = sprintf("<html><body>"), 
+write(x = sprintf("<html><head><link rel='stylesheet' href='styles.css'></head><body><br /><h1>oNHM daily model output test result report for %s</h1><br/><br/>", today), 
       file = validate_fn)
 
 var_data_list <- lapply(vars, function(var) {
