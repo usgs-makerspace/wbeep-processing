@@ -23,14 +23,6 @@ validate_oNHM_maps <- function(bad_data_hruids, mapfilename, var, title) {
                  size=3,
                  color="blue", check_overlap = TRUE) +
     ggtitle(sprintf("%s", title)) + 
-    # theme(axis.title.x = element_blank()) +
-    # theme(axis.title.y = element_blank()) +
-    # theme(axis.text.x = element_blank()) +
-    # theme(axis.text.y = element_blank()) +
-    # theme(axis.ticks.x = element_blank()) +
-    # theme(axis.ticks.y = element_blank()) +
-    # theme(panel.grid.major = element_line(color="transparent")) +
-    # theme(panel.background = element_blank()) +
     theme_void() +
     theme(plot.margin=grid::unit(c(0,0,0,0), "in")) +
     coord_sf(xlim=c(-126,-66), ylim=c(24,49), expand = FALSE) 
