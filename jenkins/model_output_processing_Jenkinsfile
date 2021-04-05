@@ -73,7 +73,7 @@ pipeline {
           aws s3 cp model_output_categorized.csv s3://prod-owi-resources/resources/Application/wbeep/model_output_csv/model_output_categorized_${DATE}.csv
           echo ${DATE} > date.txt
           aws s3 cp date.txt s3://prod-owi-resources/resources/Application/wbeep/${TIER}/date.txt
-          aws s3 cp . s3://wbeep-${TIER}-website/estimated-availability/date/test_results/ --recursive --exclude "*" --include "*${DATE}.csv" --include "order_of_magnitude_test_${DATE}.html"
+          aws s3 cp . s3://wbeep-${TIER}-website/estimated-availability/date/test_results/ --recursive --exclude "*" --include "*${DATE}.csv" --include "*${DATE}.png" --include "order_of_magnitude_test_${DATE}.html"
         '''
       }
     }
