@@ -126,6 +126,7 @@ if(validate_data) {
 }
 
 write(x = sprintf("</body></html>"), 
-      file = validate_fn)
+      file = validate_fn,
+      append = TRUE)
 
 readr::write_csv(values_categorized, "model_output_categorized.csv")
