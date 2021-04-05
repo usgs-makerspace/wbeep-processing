@@ -1,4 +1,4 @@
-FROM artifactory.wma.chs.usgs.gov/docker-official-mirror/rocker/geospatial:3.6.0 
+FROM artifactory.wma.chs.usgs.gov/docker-official-mirror/rocker/geospatial:4.0.4 
 
 ARG BUILD_DATE
 
