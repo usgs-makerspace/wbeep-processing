@@ -7,7 +7,7 @@ LABEL version=0.2.0
 LABEL org.label-schema.build-date=$BUILD_DATE
 
 
-RUN sudo apt-get install -y curl gnupg gdal-bin \
+RUN sudo apt-get update && apt-get install -y curl gnupg gdal-bin \
   && apt-get clean \
   && apt-get autoremove
 
