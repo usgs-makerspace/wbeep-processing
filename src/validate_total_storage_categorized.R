@@ -52,6 +52,8 @@ validate_total_storage_categorized <- function(data_categorized, validate_fn, n_
         file = validate_fn,
         append = TRUE)
   } else {
-    write(x = sprintf("<img src=icon-check.png' alt='test passed'> All HRUs categorized as problems are correctly categorized as Undefined and no new/unexpected Undefined values have been found. <br />"))
+    write(x = sprintf("<img src='icon-check.png' alt='test passed'> All HRUs categorized as problems are correctly categorized as Undefined and no new/unexpected Undefined values have been found. <br />"),
+          file = validate_fn,
+          append = TRUE)
   }
 }
