@@ -34,7 +34,8 @@ RUN install2.r --error \
 	lwgeom \
 	ncmeta \
 	assertthat \
-	ggplot2
+	ggplot2 \ 
+	tableHTML
 
 RUN mkdir -p wbeep-processing &&\
     chown rstudio wbeep-processing
