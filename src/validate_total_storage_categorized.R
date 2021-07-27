@@ -33,11 +33,27 @@ validate_total_storage_categorized <- function(data_categorized, validate_fn, n_
           append = TRUE)
   }
   # Use validate_that instead of assert_that so we get a warning instead of an error
-  validate_that(all(data_categorized_problem_hru$value == "Undefined"), msg = "Expecting all Undefined categorization, other value found.")
-  validate_that(!"Undefined" %in% unique(data_categorized_good_hrus$value), msg = "Expecting all properly categorized data, Undefined found")
+  if (validate_that(all(data_categorized_problem_hru$value == "Undefined"))) {
+    write(x = sprintf("<img src='icon-check.png' alt='test passed'> All problem hru ids correctly categorized as Undefined.<br />"), 
+          file = validate_fn,
+          append = TRUE)
+  } else {
+    write(x = sprintf("<img src='icon-x.png' alt='test failed-warning'> Expecting all Undefined categorization, other value found.<br />"), 
+          file = validate_fn,
+          append = TRUE)
+  }
+  if (validate_that(!"Undefined" %in% unique(data_categorized_good_hrus$value))) {
+    write(x = sprintf("<img src='icon-check.png' alt='test passed'> All good HRUs have proper categorized values, no Undefined data found. <br />"), 
+          file = validate_fn,
+          append = TRUE)
+  } else {
+    write(x = sprintf("<img src='icon-x.png' alt='test failed-warning'> Expecting all properly categorized data, Undefined found<br />"), 
+          file = validate_fn,
+          append = TRUE)
+  }
   all_new_problem_hrus <- values_categorized[which(values_categorized$value=='Undefined'),]
   all_undefined_hrus <- all_new_problem_hrus$hru_id_nat
-  newest_problem_hrus <- all_undefined_hrus[!all_new_problem_hrus %in% problem_hruids]
+  newest_problem_hrus <- all_undefined_hrus[!all_undefined_hrus %in% problem_hruids]
   
   if (length(newest_problem_hrus)>0) {
     write(x = sprintf("<img src='icon-x.png' alt='test failed - warning'> There are unexpected/new HRUs with the categorization of Undefined. <br />"), 
