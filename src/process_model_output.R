@@ -21,7 +21,7 @@ source("src/validate_total_storage_categorized.R") # load code to test output of
 vars <- c("soil_moist_tot", "hru_intcpstor", "pkwater_equiv",
           "hru_impervstor", "gwres_stor", "dprst_stor_hru")
 
-write(x = sprintf("<html><head><link rel='stylesheet' href='styles.css'></head><body><br /><h1>oNHM daily model output test result report for %s</h1><br/><br/>", today), 
+write(x = sprintf("<html><head><title>oNHM daily model output test result report for %s</title><link rel='stylesheet' href='styles.css'></head><body><br /><h1>oNHM daily model output test result report for %s</h1><br/><br/><div class='left'>", today, today), 
       file = validate_fn)
 
 var_data_list <- lapply(vars, function(var) {
@@ -121,11 +121,11 @@ values_categorized <- total_storage_data %>%
 
 if(validate_data) {
   message("Started tests for validating categorized output")
-  validate_total_storage_categorized(values_categorized)
+  validate_total_storage_categorized(values_categorized, validate_fn)
   message("Completed tests for validating categorized output")
 }
 
-write(x = sprintf("</body></html>"), 
+write(x = sprintf("</div></body></html>"), 
       file = validate_fn,
       append = TRUE)
 
