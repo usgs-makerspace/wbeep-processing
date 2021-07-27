@@ -33,7 +33,7 @@ validate_total_storage_categorized <- function(data_categorized, validate_fn, n_
           append = TRUE)
   }
   # Use validate_that instead of assert_that so we get a warning instead of an error
-  if (validate_that(all(data_categorized_problem_hru$value == "Undefined"))) {
+  if (all(data_categorized_problem_hru$value == "Undefined")) {
     write(x = sprintf("<img src='icon-check.png' alt='test passed'> All problem hru ids correctly categorized as Undefined.<br />"), 
           file = validate_fn,
           append = TRUE)
@@ -42,7 +42,7 @@ validate_total_storage_categorized <- function(data_categorized, validate_fn, n_
           file = validate_fn,
           append = TRUE)
   }
-  if (validate_that(!"Undefined" %in% unique(data_categorized_good_hrus$value))) {
+  if (!"Undefined" %in% unique(data_categorized_good_hrus$value)) {
     write(x = sprintf("<img src='icon-check.png' alt='test passed'> All good HRUs have proper categorized values, no Undefined data found. <br />"), 
           file = validate_fn,
           append = TRUE)
