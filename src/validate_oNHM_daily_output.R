@@ -96,8 +96,8 @@ validate_oNHM_daily_output <- function(var, fn, test_date, data_nc, hruids, time
     write(x=tableHTML(higher_than_max, caption = "Table of hrus with values above max_value150x95Q") %>%
             add_css_row(css = list('background-color', '#F8F8F8'), rows = odd(1:nrow(higher_than_max)+1)) %>%
             add_css_row(css = list('background-color', '#ffffff'), rows = even(1:nrow(higher_than_max)+1)),
-          file=validate_fn,
-          append=TRUE)
+      file=validate_fn,
+      append=TRUE)
     write.csv(higher_than_max, csvfilename, row.names = FALSE)
   } else {
       message("No values above max_value150x95Q for ",var,".")

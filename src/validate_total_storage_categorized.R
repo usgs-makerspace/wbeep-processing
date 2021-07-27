@@ -8,18 +8,18 @@ validate_total_storage_categorized <- function(data_categorized, validate_fn, n_
   
   ##### Test: Key columns exist in the data #####
   
-  assert_that("hru_id_nat" %in% names(data_categorized))
-  assert_that("value" %in% names(data_categorized))
-  write(x = sprintf("<img src='icon-check.png' alt='test passed'> Key columns exist in the data <br />"), 
-        file = validate_fn,
-        append = TRUE)
+  if (assert_that("hru_id_nat" %in% names(data_categorized)) && assert_that("value" %in% names(data_categorized))) {
+    write(x = sprintf("<img src='icon-check.png' alt='test passed'> Key columns exist in the data <br />"), 
+          file = validate_fn,
+          append = TRUE)
+  }
   ##### Test: All HRUs are in the data and in the right order #####
   
-  assert_that(nrow(data_categorized) == n_hrus)
-  assert_that(all(data_categorized$hru_id_nat == 1:n_hrus))
-  write(x = sprintf("<img src='icon-check.png' alt='test passed'> All HRUs are in the data and in the right order <br />"), 
-        file = validate_fn,
-        append = TRUE)
+  if (assert_that(nrow(data_categorized) == n_hrus) && assert_that(all(data_categorized$hru_id_nat == 1:n_hrus))) {
+    write(x = sprintf("<img src='icon-check.png' alt='test passed'> All HRUs are in the data and in the right order <br />"), 
+          file = validate_fn,
+          append = TRUE)
+  }
   ##### Test: Only expected categories exist in the value column #####
   
   # In case we are missing historic data for quantiles their daily data will be Undefined
@@ -27,15 +27,19 @@ validate_total_storage_categorized <- function(data_categorized, validate_fn, n_
   data_categorized_problem_hru <- data_categorized[data_categorized$hru_id_nat %in% problem_hruids,]
   data_categorized_good_hrus <- data_categorized[!data_categorized$hru_id_nat %in% problem_hruids,]
   
-  assert_that(is.character(data_categorized$value))
+  if (assert_that(is.character(data_categorized$value))) {
+    write(x = sprintf("<img src='icon-check.png' alt='test passed'> Category data are in the expected character format.<br />"), 
+          file = validate_fn,
+          append = TRUE)
+  }
   # Use validate_that instead of assert_that so we get a warning instead of an error
-  validate_that(all(data_categorized_problem_hru$value == "Undefined"), msg = "All the HRUs categorized as problems are correctly categorized as Undefined.")
-  validate_that(!"Undefined" %in% unique(data_categorized_good_hrus$value), msg = "There are unexpected/new HRUs with the categorization of Undefined. ")
+  validate_that(all(data_categorized_problem_hru$value == "Undefined"), msg = "Expecting all Undefined categorization, other value found.")
+  validate_that(!"Undefined" %in% unique(data_categorized_good_hrus$value), msg = "Expecting all properly categorized data, Undefined found")
   all_new_problem_hrus <- values_categorized[which(values_categorized$value=='Undefined'),]
   all_new_problem_hrus <- all_new_problem_hrus$hru_id_nat
   newest_problem_hrus <- all_new_problem_hrus[!all_new_problem_hrus %in% problem_hruids]
   
-  if (length(all_new_problem_hrus)>0) {
+  if (length(newest_problem_hrus)>0) {
     write(x = sprintf("<img src='icon-x.png' alt='test failed - warning'> There are unexpected/new HRUs with the categorization of Undefined. <br />"), 
         file = validate_fn,
         append = TRUE)
@@ -48,6 +52,6 @@ validate_total_storage_categorized <- function(data_categorized, validate_fn, n_
         file = validate_fn,
         append = TRUE)
   } else {
-    write(x = sprintf("<img src=icon-check.png' alt='test passed'>All HRUs categorized as problems are correctly categorized as Undefined and no new/unexpected Undefined values have been found. <br />"))
+    write(x = sprintf("<img src=icon-check.png' alt='test passed'> All HRUs categorized as problems are correctly categorized as Undefined and no new/unexpected Undefined values have been found. <br />"))
   }
 }
