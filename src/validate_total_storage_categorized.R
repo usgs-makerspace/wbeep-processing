@@ -36,8 +36,8 @@ validate_total_storage_categorized <- function(data_categorized, validate_fn, n_
   validate_that(all(data_categorized_problem_hru$value == "Undefined"), msg = "Expecting all Undefined categorization, other value found.")
   validate_that(!"Undefined" %in% unique(data_categorized_good_hrus$value), msg = "Expecting all properly categorized data, Undefined found")
   all_new_problem_hrus <- values_categorized[which(values_categorized$value=='Undefined'),]
-  all_new_problem_hrus <- all_new_problem_hrus$hru_id_nat
-  newest_problem_hrus <- all_new_problem_hrus[!all_new_problem_hrus %in% problem_hruids]
+  all_undefined_hrus <- all_new_problem_hrus$hru_id_nat
+  newest_problem_hrus <- all_undefined_hrus[!all_new_problem_hrus %in% problem_hruids]
   
   if (length(newest_problem_hrus)>0) {
     write(x = sprintf("<img src='icon-x.png' alt='test failed - warning'> There are unexpected/new HRUs with the categorization of Undefined. <br />"), 
