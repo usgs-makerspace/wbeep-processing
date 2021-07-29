@@ -93,26 +93,26 @@ pipeline {
           }
       }      
         success {
-            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            mail to: 'gs-w_onhm@usgs.gov',
             subject: "${TIER} Success: ${currentBuild.fullDisplayName}",
             body: "Pipeline finished successfully \'${env.BUILD_URL}\'\n\n" +
             "Test result summary:\n" +
             "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/order_of_magnitude_test_${env.DATE}.html"
         }
         unstable {        
-            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            mail to: 'gs-w_onhm@usgs.gov',
             subject: "${TIER} Unstable: ${currentBuild.fullDisplayName}",
             body: "Pipeline is unstable \'${env.BUILD_URL}\'\n\n" +
             "Test result summary:\n" +
             "https://wbeep-${TIER}-website.s3-us-west-2.amazonaws.com/estimated-availability/date/test_results/order_of_magnitude_test_${env.DATE}.html" 
        }
         failure {       
-            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            mail to: 'gs-w_onhm@usgs.gov',
             subject: "${TIER} Failure: ${currentBuild.fullDisplayName}",
             body: "Pipeline failed \'${env.BUILD_URL}\'"
        }
         changed {    
-            mail to: 'mhines@usgs.gov, wwatkins@usgs.gov',
+            mail to: 'gs-w_onhm@usgs.gov',
             subject: "${TIER} Changes: ${currentBuild.fullDisplayName}",
             body: "Pipeline changed \'${env.BUILD_URL}\'\n\n" +
             "Test result summary:\n" +
